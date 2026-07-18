@@ -2,16 +2,14 @@
 
 [English](README.md) | **简体中文**
 
-这是一个适用于《Granblue Fantasy: Relink – Endless Ragnarok》的
-Reloaded-II 模组。游戏原本会在 Infinity 副本中禁用完全托管模式，这个模组移除
-了这项限制，让游戏自带的 AI 可以继续接管战斗。
+这是一个适用于《Granblue Fantasy: Relink – Endless Ragnarok》的 Reloaded-II 模组。这个模组会移除游戏原本在 Infinity 副本中禁用完全托管模式的限制，使游戏自带的 AI 可以继续接管战斗。
 
-它不会改变 AI 的行为，也不会替你处理 Infinity 的特殊机制。
+模组不会改变 AI 的行为，也不会处理 Infinity 的特殊机制。
 
 ## 功能
 
 - 只对 Infinity 副本生效。
-- 需要先在游戏设置中选择“完全托管模式”。
+- 需要在游戏设置中选择“完全托管模式”。
 - 支持单人和联机，Host 与 Guest 均可使用。
 - 不影响其他难度或其他辅助模式。
 - 不修改伤害、奖励、掉落、存档或网络状态。
@@ -25,8 +23,7 @@ ApplicationVersion: 2.0.2
 SHA-256: 63340832BCF731FBC97796F686B05C988418E83D451D4A49B2244A85D00E297F
 ```
 
-模组会检查游戏主程序。版本或文件不匹配时不会加载修改，以免游戏更新后因地址
-变化而崩溃。
+模组会检查游戏主程序。版本或文件不匹配时不会加载修改，以免游戏更新后因地址变化而崩溃。
 
 ## 前置要求
 
@@ -66,8 +63,7 @@ Reloaded-II\Mods\gbfr.qol.infinityfullassist
 ```
 
 - `Enabled`：开启或关闭模组功能。
-- `DiagnosticLogging`：在 Reloaded-II 日志中记录诊断信息。只有排查问题时才需要
-  开启。
+- `DiagnosticLogging`：在 Reloaded-II 日志中记录诊断信息。只有排查问题时才需要开启。
 
 配置可以在游戏运行时修改。
 
@@ -80,45 +76,39 @@ Reloaded-II\Mods\gbfr.qol.infinityfullassist
 - Lucilius
 - Bahamut Versa
 
-完全托管在单人和联机模式下都可以正常启用。模组按 Infinity 类型识别副本，因此
-以后同一游戏版本中出现其他 Infinity 副本时，不需要依赖显示名称。
+完全托管在单人和联机模式下都可以正常启用。
 
 ## 工作原理
 
-模组先保留游戏原本的判断。只有游戏准备禁用完全托管时，它才检查玩家是否选择了
-完全托管，以及当前副本是否属于 Infinity。识别 Infinity 时优先使用副本类型；
-类型无法读取时，再查询已经确认的副本列表。任何信息不完整的情况都会保持游戏
-原本的结果。
+模组先保留游戏原本的判断逻辑。只有游戏准备禁用完全托管时，它才检查玩家是否选择了完全托管，以及当前副本是否属于 Infinity。识别 Infinity 时优先使用副本类型；类型无法读取时，再查询已经确认的副本列表。任何信息不完整的情况都会保持游戏原本的结果。
+
+模组按 Infinity 类型识别副本，因此如果后续版本更新了其他 Infinity 副本时，模组不需要依赖显示名称，也应该能够正常生效。
 
 ## 已知限制
 
-这个模组只是允许原生 AI 在 Infinity 中运行。Infinity 的部分机制需要指定目标、
-及时打断或满足伤害检查，游戏 AI 不一定能够独立完成。
+这个模组只是允许原生 AI 在 Infinity 中运行。Infinity 的部分机制需要指定目标、及时打断或满足伤害检测，游戏 AI 不一定能够独立完成。
 
-游戏更新后，即使主界面仍显示相近的版本号，也可能需要重新适配。更新游戏前建议
-先在 Reloaded-II 中停用模组。
+游戏更新后，即使主界面仍显示相近的版本号，也可能需要重新适配。更新游戏前建议先在 Reloaded-II 中停用模组。
 
 ## 故障排查
 
 ### 游戏内没有显示模组名称
 
-右下角通知有时只显示 Relink Mod Manager。请在 Reloaded-II 中确认模组已经为
-游戏启用，并检查最新日志中是否出现 `Infinity Full Assist Unlock`。
+右下角通知有时只显示 Relink Mod Manager。请在 Reloaded-II 中确认模组已经为游戏启用，并检查最新日志中是否出现 `Infinity Full Assist Unlock`。
 
 ### 游戏在加载模组时退出
 
-检查前置依赖是否完整、版本是否符合要求。旧版 SigScan 或 Universal Redirector
-可能导致加载失败。
+检查前置依赖是否完整、版本是否符合要求。旧版 SigScan 或 Universal Redirector 可能导致加载失败。
 
 ### Infinity 中仍然无法完全托管
 
-确认游戏设置中选择的是“完全托管”，而不是普通辅助模式。随后打开
-`DiagnosticLogging`，重新进入一次副本并查看 Reloaded-II 日志。
+确认游戏设置中选择的是“完全托管”，而不是普通辅助模式。随后打开`DiagnosticLogging`，重新进入一次副本并查看 Reloaded-II 日志。
 
 ### 游戏更新后模组停止工作
 
-这是预期行为。模组不会在未经验证的游戏主程序上继续运行，请停用模组并等待兼容
-版本。
+这是预期行为。模组不会在未经验证的游戏主程序上继续运行，请停用模组并等待兼容版本。
+
+或者，你也可以选择下载源码，修改关于游戏版本字段检验的代码，然后自行编译。
 
 ## 从源码构建
 
