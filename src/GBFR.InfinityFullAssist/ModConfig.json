@@ -1,0 +1,27 @@
+{
+  "ModId": "gbfr.qol.infinityfullassist",
+  "ModName": "Infinity Full Assist Unlock",
+  "ModAuthor": "AkieGZH",
+  "ModVersion": "1.0.0",
+  "ModDescription": "Allows the game's built-in Full Assist mode to remain active in Infinity quests on the verified Endless Ragnarok 2.0.2 executable.",
+  "ModDll": "GBFR.InfinityFullAssist.dll",
+  "ModIcon": "Preview.png",
+  "ModR2RManagedDll32": "",
+  "ModR2RManagedDll64": "",
+  "ModNativeDll32": "",
+  "ModNativeDll64": "",
+  "IsLibrary": false,
+  "ReleaseMetadataFileName": "",
+  "PluginData": {},
+  "IsUniversalMod": false,
+  "ModDependencies": [
+    "Reloaded.Memory.SigScan.ReloadedII",
+    "reloaded.sharedlib.hooks",
+    "gbfrelink.utility.manager"
+  ],
+  "OptionalDependencies": [],
+  "SupportedAppId": [
+    "granblue_fantasy_relink.exe"
+  ],
+  "ProjectUrl": ""
+}

@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GBFR.InfinityFullAssist", "src\GBFR.InfinityFullAssist\GBFR.InfinityFullAssist.csproj", "{DE9BDCB7-44E5-4C91-BA3E-3C564704DB86}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GBFR.InfinityFullAssist.Tests", "tests\GBFR.InfinityFullAssist.Tests\GBFR.InfinityFullAssist.Tests.csproj", "{E8F59B18-0290-4A9B-9832-17BE93073564}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DE9BDCB7-44E5-4C91-BA3E-3C564704DB86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE9BDCB7-44E5-4C91-BA3E-3C564704DB86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE9BDCB7-44E5-4C91-BA3E-3C564704DB86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE9BDCB7-44E5-4C91-BA3E-3C564704DB86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8F59B18-0290-4A9B-9832-17BE93073564}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8F59B18-0290-4A9B-9832-17BE93073564}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8F59B18-0290-4A9B-9832-17BE93073564}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8F59B18-0290-4A9B-9832-17BE93073564}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

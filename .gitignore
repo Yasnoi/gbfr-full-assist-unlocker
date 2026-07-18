@@ -1,0 +1,41 @@
+# IDE, editor, and Codex-local state.
+/.agents/
+/.codex/
+/.codegraph/
+/.idea/
+/.vs/
+/.vscode/
+/.fleet/
+
+# .NET build output and test artifacts.
+**/bin/
+**/obj/
+/artifacts/
+/TestResults/
+/packages/
+*.pdb
+*.suo
+*.user
+
+# Local tools, downloads, and reference repositories.
+/.downloads/
+/Reloaded-II/
+/gbfrelink.utility.manager/
+/ghidra_*/
+/references/
+/x64dbg/
+
+# Local publishing notes, reverse-engineering data, and transient output.
+/analysis/
+/docs/
+*.gpr
+*.rep/
+
+# Operating-system and temporary files.
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.bak
+*.log
+*.tmp
+*~

@@ -1,0 +1,380 @@
+using System.Buffers.Binary;
+using System.Runtime.InteropServices;
+using GBFR.InfinityFullAssist.Configuration;
+using GBFR.InfinityFullAssist.Core;
+using NenTools.Reloaded.ScanManager.Interfaces;
+using Reloaded.Hooks.Definitions;
+using Reloaded.Mod.Interfaces;
+using IReloadedHooks = Reloaded.Hooks.ReloadedII.Interfaces.IReloadedHooks;
+
+namespace GBFR.InfinityFullAssist.Runtime;
+
+internal sealed class FullAssistGateHook : IDisposable
+{
+    private const string SignatureGroup = "granblue_fantasy_relink_er_2_0_2";
+    private const string GateScanName = "FullAssistGate";
+    private const string AssistDisableHandlerScanName =
+        "AssistDisableTermHandler";
+
+    internal const string GateSignature =
+        "48 83 EC 28 48 8B 0D ?? ?? ?? ?? 48 8D 54 24 24 E8 ?? ?? ?? ?? " +
+        "8B 4C 24 24 89 C8 C1 E8 14";
+
+    internal const string AssistDisableHandlerSignature =
+        "56 57 48 83 EC 28 48 8B 05 ?? ?? ?? ?? 0F B6 49 30 " +
+        "88 88 4E 0E 00 00 48 8B 3D ?? ?? ?? ?? 31 F6 E8 ?? ?? ?? ?? " +
+        "B9 00 00 00 00 84 C0 74 ?? 8B 47 10";
+
+    private static readonly BytePattern GatePattern = BytePattern.Parse(GateSignature);
+    private static readonly BytePattern AssistDisableHandlerPattern =
+        BytePattern.Parse(AssistDisableHandlerSignature);
+
+    private readonly ILogger _logger;
+    private readonly string _modId;
+    private readonly IReloadedHooks _hooks;
+    private readonly IRuntimeMemoryReader _memory;
+    private readonly object _installLock = new();
+    private readonly object _logLock = new();
+    private readonly InfinityQuestClassifier _classifier;
+    private readonly FullAssistGatePolicy _policy;
+    private readonly PackedQuestIdDecoder _questIdDecoder;
+
+    private Config _config;
+    private nint _gateAddress;
+    private nint _assistDisableTermHandlerAddress;
+    private QuestRuntimeStateReader? _stateReader;
+    private IHook<FullAssistGateDelegate>? _gateHook;
+    private DecisionLogKey? _lastDecisionLog;
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate byte FullAssistGateDelegate();
+
+    public FullAssistGateHook(
+        ILogger logger,
+        string modId,
+        Config config,
+        IReloadedHooks hooks,
+        IRuntimeMemoryReader memory)
+    {
+        _logger = logger;
+        _modId = modId;
+        _config = config;
+        _hooks = hooks;
+        _memory = memory;
+
+        _classifier = new InfinityQuestClassifier(
+            VerifiedInfinityData.FallbackQuestIds.ToArray());
+        _policy = new FullAssistGatePolicy(_classifier);
+        _questIdDecoder = new PackedQuestIdDecoder(
+            new QuestTypeResolver(
+                (
+                    VerifiedInfinityData.MultiQuestCategory,
+                    VerifiedInfinityData.InfinitySubCategory
+                ),
+                [
+                    (Category: 4, SubCategory: 8),
+                    (Category: 4, SubCategory: 10)
+                ]));
+    }
+
+    public bool IsInstalled => _gateHook?.IsHookEnabled == true;
+
+    public void UpdateConfiguration(Config config) =>
+        Volatile.Write(ref _config, config);
+
+    public void RegisterScans(IScanManager scanManager)
+    {
+        ArgumentNullException.ThrowIfNull(scanManager);
+
+        scanManager.AddScan(GateScanName, SignatureGroup, address =>
+        {
+            _gateAddress = address;
+            TryInstall();
+        });
+        scanManager.AddScan(
+            AssistDisableHandlerScanName,
+            SignatureGroup,
+            address =>
+            {
+                _assistDisableTermHandlerAddress = address;
+                TryInstall();
+            });
+    }
+
+    internal bool EvaluateForTests(
+        bool originalResult,
+        bool fullAssistSelected,
+        QuestSnapshot snapshot)
+    {
+        return _policy.Decide(
+            originalResult,
+            Volatile.Read(ref _config).Enabled,
+            fullAssistSelected,
+            snapshot);
+    }
+
+    private void TryInstall()
+    {
+        lock (_installLock)
+        {
+            if (_gateHook is not null ||
+                _gateAddress == 0 ||
+                _assistDisableTermHandlerAddress == 0)
+            {
+                return;
+            }
+
+            if (!ValidateOpcode(_gateAddress, GatePattern, GateScanName) ||
+                !ValidateOpcode(
+                    _assistDisableTermHandlerAddress,
+                    AssistDisableHandlerPattern,
+                    AssistDisableHandlerScanName))
+            {
+                return;
+            }
+
+            if (!TryResolveRipRelativeAddress(
+                    _gateAddress + 4,
+                    displacementOffset: 3,
+                    instructionLength: 7,
+                    out var questStateGlobalPointer) ||
+                !TryResolveRipRelativeAddress(
+                    _assistDisableTermHandlerAddress + 0x17,
+                    displacementOffset: 3,
+                    instructionLength: 7,
+                    out var assistSelectionGlobalPointer) ||
+                !TryResolveRelativeCallAddress(
+                    _gateAddress + 0x10,
+                    out var questIdGetterAddress))
+            {
+                LogFailure(
+                    "Failed to resolve a verified state pointer or Quest ID getter.");
+                return;
+            }
+
+            try
+            {
+                var questIdGetter = _hooks.CreateWrapper<CurrentQuestIdGetter>(
+                    questIdGetterAddress,
+                    out _);
+                _stateReader = new QuestRuntimeStateReader(
+                    _memory,
+                    questStateGlobalPointer,
+                    assistSelectionGlobalPointer,
+                    questIdGetter);
+
+                var hook = _hooks.CreateHook<FullAssistGateDelegate>(
+                    FullAssistGateDetour,
+                    _gateAddress);
+                _gateHook = hook;
+                hook.Activate();
+
+                _logger.WriteLine(
+                    $"[{_modId}] Infinity Full Assist gate hook installed for ER 2.0.2.",
+                    System.Drawing.Color.Green);
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    _gateHook?.Disable();
+                }
+                catch (Exception)
+                {
+                    // Installation already failed. Keep unwinding fail-closed.
+                }
+
+                _gateHook = null;
+                _stateReader = null;
+                LogFailure(
+                    $"Hook installation failed ({ex.GetType().Name}).");
+            }
+        }
+    }
+
+    private byte FullAssistGateDetour()
+    {
+        var hook = _gateHook;
+        if (hook is null)
+        {
+            return 0;
+        }
+
+        var originalResult = hook.OriginalFunction();
+        if (originalResult != 0)
+        {
+            LogDecisionIfRequested(
+                default,
+                QuestTypeResolution.Unavailable,
+                originalResult,
+                originalResult,
+                stateReadable: false);
+            return originalResult;
+        }
+
+        var config = Volatile.Read(ref _config);
+        if (!config.Enabled && !config.DiagnosticLogging)
+        {
+            return originalResult;
+        }
+
+        try
+        {
+            var stateReader = _stateReader;
+            if (stateReader is null || !stateReader.TryRead(out var state))
+            {
+                LogDecisionIfRequested(
+                    default,
+                    QuestTypeResolution.Unavailable,
+                    originalResult,
+                    originalResult,
+                    stateReadable: false);
+                return originalResult;
+            }
+
+            var quest = _questIdDecoder.Decode(state.QuestId);
+            var fullAssistSelected =
+                state.AssistMode == VerifiedInfinityData.FullAssistMode;
+            var result = _policy.Decide(
+                originalResult: false,
+                enabled: config.Enabled,
+                fullAssistSelected,
+                quest);
+            var finalResult = result ? (byte)1 : originalResult;
+
+            LogDecisionIfRequested(
+                state,
+                quest.TypeResolution,
+                originalResult,
+                finalResult,
+                stateReadable: true);
+            return finalResult;
+        }
+        catch (Exception ex)
+        {
+            if (config.DiagnosticLogging)
+            {
+                _logger.WriteLine(
+                    $"[{_modId}] Runtime state read failed ({ex.GetType().Name}); original result retained.",
+                    System.Drawing.Color.Yellow);
+            }
+
+            return originalResult;
+        }
+    }
+
+    private bool ValidateOpcode(nint address, BytePattern pattern, string name)
+    {
+        var bytes = new byte[pattern.Length];
+        if (!_memory.TryReadBytes(address, bytes) || !pattern.Matches(bytes))
+        {
+            LogFailure($"{name} opcode validation failed; hook not installed.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool TryResolveRipRelativeAddress(
+        nint instructionAddress,
+        int displacementOffset,
+        int instructionLength,
+        out nint target)
+    {
+        target = 0;
+        Span<byte> displacementBytes = stackalloc byte[sizeof(int)];
+        if (!_memory.TryReadBytes(
+                instructionAddress + displacementOffset,
+                displacementBytes))
+        {
+            return false;
+        }
+
+        var displacement = BinaryPrimitives.ReadInt32LittleEndian(displacementBytes);
+        target = instructionAddress + instructionLength + displacement;
+        return ReloadedRuntimeMemoryReader.IsLikelyPointer(target);
+    }
+
+    private bool TryResolveRelativeCallAddress(
+        nint instructionAddress,
+        out nint target)
+    {
+        target = 0;
+        Span<byte> instruction = stackalloc byte[5];
+        if (!_memory.TryReadBytes(instructionAddress, instruction) ||
+            instruction[0] != 0xE8)
+        {
+            return false;
+        }
+
+        var displacement =
+            BinaryPrimitives.ReadInt32LittleEndian(instruction[1..]);
+        target = instructionAddress + instruction.Length + displacement;
+        return ReloadedRuntimeMemoryReader.IsLikelyPointer(target);
+    }
+
+    private void LogDecisionIfRequested(
+        RuntimeAssistState state,
+        QuestTypeResolution typeResolution,
+        byte originalResult,
+        byte finalResult,
+        bool stateReadable)
+    {
+        if (!Volatile.Read(ref _config).DiagnosticLogging)
+        {
+            return;
+        }
+
+        var key = new DecisionLogKey(
+            stateReadable,
+            state.QuestId,
+            state.AssistMode,
+            state.DisableAssistTerm,
+            typeResolution,
+            originalResult,
+            finalResult);
+        lock (_logLock)
+        {
+            if (_lastDecisionLog == key)
+            {
+                return;
+            }
+
+            _lastDecisionLog = key;
+            var assistMode = stateReadable
+                ? state.AssistMode.ToString()
+                : "unavailable";
+            _logger.WriteLine(
+                $"[{_modId}] gate=0x{_gateAddress:X}; " +
+                $"state={(stateReadable ? "readable" : "unavailable")}; " +
+                $"quest=0x{state.QuestId:X6}; type={typeResolution}; " +
+                $"assistMode={assistMode}; " +
+                $"disableTerm={state.DisableAssistTerm?.ToString() ?? "unavailable"}; " +
+                $"original={originalResult != 0}; final={finalResult != 0}");
+        }
+    }
+
+    private void LogFailure(string message) =>
+        _logger.WriteLine(
+            $"[{_modId}] {message} Original behavior retained.",
+            System.Drawing.Color.Red);
+
+    public void Dispose()
+    {
+        lock (_installLock)
+        {
+            _gateHook?.Disable();
+            _gateHook = null;
+            _stateReader = null;
+        }
+    }
+
+    private readonly record struct DecisionLogKey(
+        bool StateReadable,
+        uint QuestId,
+        byte AssistMode,
+        bool? DisableAssistTerm,
+        QuestTypeResolution TypeResolution,
+        byte OriginalResult,
+        byte FinalResult);
+}
