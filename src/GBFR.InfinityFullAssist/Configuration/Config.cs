@@ -11,14 +11,14 @@ public sealed class Config : IConfigurable
         new() { WriteIndented = true };
 
     [DisplayName("Enabled")]
-    [Description("Allow the built-in Full Assist Mode and Partial Assist Mode in Infinity quests on the verified game build.")]
+    [Description("Allow the built-in Assist Mode and Full Assist Mode in Infinity quests on the verified game build.")]
     [DefaultValue(true)]
     public bool Enabled { get; set; } = true;
 
-    [DisplayName("Enable Partial Assist Mode")]
-    [Description("Allow the built-in Partial Assist Mode in addition to Full Assist Mode.")]
+    [DisplayName("Enable Assist Mode")]
+    [Description("Allow the built-in Assist Mode in addition to Full Assist Mode.")]
     [DefaultValue(false)]
-    public bool EnablePartialAssist { get; set; }
+    public bool EnableAssistMode { get; set; }
 
     [DisplayName("Diagnostic Logging")]
     [Description("Log build validation and one decision record per quest entry. Does not change behavior.")]
@@ -48,15 +48,30 @@ public sealed class Config : IConfigurable
         }
 
         Directory.CreateDirectory(directory);
-        var config = (File.Exists(filePath)
-            ? JsonSerializer.Deserialize<Config>(
-                File.ReadAllBytes(filePath),
-                SerializerOptions)
-            : new Config()) ?? new Config();
+        var config = File.Exists(filePath)
+            ? Deserialize(File.ReadAllBytes(filePath))
+            : new Config();
 
         config.FilePath = filePath;
         config.ConfigName = configName;
         config.Save = config.SaveToFile;
+        return config;
+    }
+
+    internal static Config Deserialize(ReadOnlyMemory<byte> json)
+    {
+        var config = JsonSerializer.Deserialize<Config>(
+            json.Span,
+            SerializerOptions) ?? new Config();
+        using var document = JsonDocument.Parse(json);
+        var root = document.RootElement;
+        if (!root.TryGetProperty(nameof(EnableAssistMode), out _) &&
+            root.TryGetProperty("EnablePartialAssist", out var legacySetting) &&
+            legacySetting.ValueKind is JsonValueKind.True or JsonValueKind.False)
+        {
+            config.EnableAssistMode = legacySetting.GetBoolean();
+        }
+
         return config;
     }
 

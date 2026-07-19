@@ -144,7 +144,7 @@ internal sealed class Mod : IDisposable
             _logger.WriteLine(
                 $"[{_modConfig.ModId}] Configuration updated: " +
                 $"Enabled={config.Enabled}, " +
-                $"EnablePartialAssist={config.EnablePartialAssist}, " +
+                $"EnableAssistMode={config.EnableAssistMode}, " +
                 "DiagnosticLogging=true.");
         }
     }

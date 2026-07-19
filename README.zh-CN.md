@@ -1,15 +1,15 @@
-# Infinity Full Assist Unlock
+# Infinity Assist Unlock
 
 [English](README.md) | **简体中文**
 
-这是一个适用于《Granblue Fantasy: Relink – Endless Ragnarok》的 Reloaded-II 模组。这个模组会移除游戏原本在 Infinity 副本中禁用战斗托管模式和战斗辅助模式的限制，使游戏自带的 AI 可以继续接管战斗。战斗辅助模式需要在模组设置中单独开启。
+这是一个适用于《Granblue Fantasy: Relink – Endless Ragnarok》的 Reloaded-II 模组。这个模组会移除游戏原本在 Infinity 副本中禁用战斗辅助模式和战斗托管模式的限制，使游戏自带的 AI 可以继续接管战斗。战斗辅助模式需要在模组设置中单独开启。
 
 模组不会改变 AI 的行为，也不会处理 Infinity 的特殊机制。
 
 ## 功能
 
 - 只对 Infinity 副本生效。
-- 战斗托管模式默认可用，战斗辅助模式可以单独开启。
+- 战斗辅助模式可以单独开启，战斗托管模式默认可用。
 - 支持单人和联机，Host 与 Guest 均可使用。
 - 不影响其他难度或其他辅助模式。
 - 不修改伤害、奖励、掉落、存档或网络状态。
@@ -42,10 +42,10 @@ SHA-256: 63340832BCF731FBC97796F686B05C988418E83D451D4A49B2244A85D00E297F
 
 1. 在 Reloaded-II 中添加 `granblue_fantasy_relink.exe`。
 2. 安装并启用 Granblue Fantasy Relink Mod Manager。
-3. 将 `Infinity-Full-Assist-Unlock-1.1.1.zip` 拖入 Reloaded-II。
-4. 为游戏启用 **Infinity Full Assist Unlock**。
+3. 将 `Infinity-Assist-Unlock-1.1.1.zip` 拖入 Reloaded-II。
+4. 为游戏启用 **Infinity Assist Unlock**。
 5. 通过 Reloaded-II 启动游戏。
-6. 在进入 Infinity 副本前，将游戏的辅助模式设为“战斗托管模式”或“战斗辅助模式”。
+6. 在进入 Infinity 副本前，将游戏的辅助模式设为“战斗辅助模式”或“战斗托管模式”。
 
 手动安装时，将压缩包内容解压到：
 
@@ -55,20 +55,20 @@ Reloaded-II\Mods\gbfr.qol.infinityfullassist
 
 ## 配置
 
-在 Reloaded-II 的模组列表中选中 **Infinity Full Assist Unlock**，点击
+在 Reloaded-II 的模组列表中选中 **Infinity Assist Unlock**，点击
 “Mod 配置”即可修改设置，不需要先启动游戏。保存后，Reloaded-II 会在用户配置
 目录中创建或更新 `Config.json`。
 
 ```json
 {
   "Enabled": true,
-  "EnablePartialAssist": false,
+  "EnableAssistMode": false,
   "DiagnosticLogging": false
 }
 ```
 
 - `Enabled`：开启或关闭模组功能。
-- `EnablePartialAssist`：同时允许战斗辅助模式。默认关闭，战斗托管模式不受这个设置影响。
+- `EnableAssistMode`：同时允许战斗辅助模式。默认关闭，战斗托管模式不受这个设置影响。
 - `DiagnosticLogging`：在 Reloaded-II 日志中记录诊断信息。只有排查问题时才需要开启。
 
 也可以直接编辑 `Config.json`。游戏运行期间保存配置后，模组会自动重新加载。
@@ -82,11 +82,11 @@ Reloaded-II\Mods\gbfr.qol.infinityfullassist
 - Lucilius
 - Bahamut Versa
 
-战斗托管模式在单人和联机模式下都可以正常启用，战斗辅助模式也已经完成游戏内测试。
+战斗辅助模式已经完成游戏内测试，战斗托管模式在单人和联机模式下都可以正常启用。
 
 ## 工作原理
 
-模组先保留游戏原本的判断逻辑。只有游戏准备禁用战斗托管模式或战斗辅助模式时，它才检查玩家选择的模式、是否已经按需开启 `EnablePartialAssist`，以及当前副本是否属于 Infinity。识别 Infinity 时优先使用副本类型；类型无法读取时，再查询已经确认的副本列表。任何信息不完整的情况都会保持游戏原本的结果。
+模组先保留游戏原本的判断逻辑。只有游戏准备禁用战斗辅助模式或战斗托管模式时，它才检查玩家选择的模式、是否已经按需开启 `EnableAssistMode`，以及当前副本是否属于 Infinity。识别 Infinity 时优先使用副本类型；类型无法读取时，再查询已经确认的副本列表。任何信息不完整的情况都会保持游戏原本的结果。
 
 模组按 Infinity 类型识别副本，因此如果后续版本更新了其他 Infinity 副本时，模组不需要依赖显示名称，也应该能够正常生效。
 
@@ -100,7 +100,7 @@ Reloaded-II\Mods\gbfr.qol.infinityfullassist
 
 ### 游戏内没有显示模组名称
 
-右下角通知有时只显示 Relink Mod Manager。请在 Reloaded-II 中确认模组已经为游戏启用，并检查最新日志中是否出现 `Infinity Full Assist Unlock`。
+右下角通知有时只显示 Relink Mod Manager。请在 Reloaded-II 中确认模组已经为游戏启用，并检查最新日志中是否出现 `Infinity Assist Unlock`。
 
 ### 游戏在加载模组时退出
 
@@ -108,7 +108,7 @@ Reloaded-II\Mods\gbfr.qol.infinityfullassist
 
 ### Infinity 中仍然无法使用托管模式
 
-使用战斗托管模式时，确认游戏设置中已经选择“战斗托管模式”。使用战斗辅助模式时，还需要在模组设置中打开 `EnablePartialAssist`。随后可以打开 `DiagnosticLogging`，重新进入一次副本并查看 Reloaded-II 日志。
+使用战斗辅助模式时，还需要在模组设置中打开 `EnableAssistMode`。使用战斗托管模式时，确认游戏设置中已经选择“战斗托管模式”。随后可以打开 `DiagnosticLogging`，重新进入一次副本并查看 Reloaded-II 日志。
 
 ### 游戏更新后模组停止工作
 

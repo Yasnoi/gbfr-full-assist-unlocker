@@ -2,22 +2,22 @@ namespace GBFR.InfinityFullAssist.Core;
 
 public sealed class AssistModeUnlockPolicy
 {
-    private readonly byte _partialAssistMode;
+    private readonly byte _assistMode;
     private readonly byte _fullAssistMode;
 
-    public AssistModeUnlockPolicy(byte partialAssistMode, byte fullAssistMode)
+    public AssistModeUnlockPolicy(byte assistMode, byte fullAssistMode)
     {
-        if (partialAssistMode == fullAssistMode)
+        if (assistMode == fullAssistMode)
         {
             throw new ArgumentException(
-                "Partial Assist and Full Assist must use different mode values.");
+                "Assist Mode and Full Assist Mode must use different mode values.");
         }
 
-        _partialAssistMode = partialAssistMode;
+        _assistMode = assistMode;
         _fullAssistMode = fullAssistMode;
     }
 
-    public bool IsUnlocked(byte assistMode, bool enablePartialAssist) =>
+    public bool IsUnlocked(byte assistMode, bool enableAssistMode) =>
         assistMode == _fullAssistMode ||
-        (enablePartialAssist && assistMode == _partialAssistMode);
+        (enableAssistMode && assistMode == _assistMode);
 }

@@ -67,7 +67,7 @@ internal sealed class FullAssistGateHook : IDisposable
         _policy = new FullAssistGatePolicy(
             _classifier,
             new AssistModeUnlockPolicy(
-                VerifiedInfinityData.PartialAssistMode,
+                VerifiedInfinityData.AssistMode,
                 VerifiedInfinityData.FullAssistMode));
         _questIdDecoder = new PackedQuestIdDecoder(
             new QuestTypeResolver(
@@ -114,7 +114,7 @@ internal sealed class FullAssistGateHook : IDisposable
         return _policy.Decide(
             originalResult,
             config.Enabled,
-            config.EnablePartialAssist,
+            config.EnableAssistMode,
             assistMode,
             snapshot);
     }
@@ -242,7 +242,7 @@ internal sealed class FullAssistGateHook : IDisposable
             var result = _policy.Decide(
                 originalResult: false,
                 enabled: config.Enabled,
-                enablePartialAssist: config.EnablePartialAssist,
+                enableAssistMode: config.EnableAssistMode,
                 assistMode: state.AssistMode,
                 quest);
             var finalResult = result ? (byte)1 : originalResult;

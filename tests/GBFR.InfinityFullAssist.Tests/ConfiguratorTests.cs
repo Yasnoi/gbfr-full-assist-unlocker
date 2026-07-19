@@ -38,12 +38,12 @@ public sealed class ConfiguratorTests
 
             Assert.Equal("Mod Configuration", config.ConfigName);
             Assert.True(config.Enabled);
-            Assert.False(config.EnablePartialAssist);
+            Assert.False(config.EnableAssistMode);
             Assert.False(config.DiagnosticLogging);
             Assert.NotNull(config.Save);
 
             config.Enabled = false;
-            config.EnablePartialAssist = true;
+            config.EnableAssistMode = true;
             config.DiagnosticLogging = true;
             config.Save();
 
@@ -53,13 +53,13 @@ public sealed class ConfiguratorTests
             var root = document.RootElement;
             Assert.False(root.GetProperty("Enabled").GetBoolean());
             Assert.True(
-                root.GetProperty("EnablePartialAssist").GetBoolean());
+                root.GetProperty("EnableAssistMode").GetBoolean());
             Assert.True(
                 root.GetProperty("DiagnosticLogging").GetBoolean());
 
             using var runtimeStore = new ConfigStore(directory);
             Assert.False(runtimeStore.Current.Enabled);
-            Assert.True(runtimeStore.Current.EnablePartialAssist);
+            Assert.True(runtimeStore.Current.EnableAssistMode);
             Assert.True(runtimeStore.Current.DiagnosticLogging);
         }
         finally

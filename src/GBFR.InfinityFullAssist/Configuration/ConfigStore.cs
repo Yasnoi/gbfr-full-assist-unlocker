@@ -32,10 +32,8 @@ internal sealed class ConfigStore : IDisposable
         if (File.Exists(_path))
         {
             var json = File.ReadAllBytes(_path);
-            config = JsonSerializer.Deserialize<Config>(
-                json,
-                SerializerOptions) ?? new Config();
-            if (!ContainsPartialAssistSetting(json))
+            config = Config.Deserialize(json);
+            if (!ContainsAssistModeSetting(json))
             {
                 Write(config);
             }
@@ -49,11 +47,11 @@ internal sealed class ConfigStore : IDisposable
         return config;
     }
 
-    private static bool ContainsPartialAssistSetting(ReadOnlyMemory<byte> json)
+    private static bool ContainsAssistModeSetting(ReadOnlyMemory<byte> json)
     {
         using var document = JsonDocument.Parse(json);
         return document.RootElement.TryGetProperty(
-            nameof(Config.EnablePartialAssist),
+            nameof(Config.EnableAssistMode),
             out _);
     }
 

@@ -7,7 +7,7 @@ internal static class VerifiedInfinityData
     // 40B301/309/313/314/316 => 4/11.
     public const int MultiQuestCategory = 4;
     public const int InfinitySubCategory = 11;
-    public const byte PartialAssistMode = 1;
+    public const byte AssistMode = 1;
     public const byte FullAssistMode = 2;
 
     // These are the only quest IDs referenced by the 2.0.2 quest_infinity UI assets.

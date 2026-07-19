@@ -1,9 +1,9 @@
 {
   "ModId": "gbfr.qol.infinityfullassist",
-  "ModName": "Infinity Full Assist Unlock",
+  "ModName": "Infinity Assist Unlock",
   "ModAuthor": "AkieGZH",
   "ModVersion": "1.1.1",
-  "ModDescription": "Allows the game's built-in Full Assist Mode and Partial Assist Mode to remain active in Infinity quests on the verified Endless Ragnarok 2.0.2 executable.",
+  "ModDescription": "Allows the game's built-in Assist Mode and Full Assist Mode to remain active in Infinity quests on the verified Endless Ragnarok 2.0.2 executable.",
   "ModDll": "GBFR.InfinityFullAssist.dll",
   "ModIcon": "Preview.png",
   "ModR2RManagedDll32": "",

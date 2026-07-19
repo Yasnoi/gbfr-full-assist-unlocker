@@ -6,7 +6,7 @@ namespace GBFR.InfinityFullAssist.Tests;
 public sealed class ConfigStoreTests
 {
     [Fact]
-    public void ExistingConfigIsMigratedWithPartialAssistDisabled()
+    public void LegacyPartialAssistSettingIsMigratedToAssistMode()
     {
         var directory = Path.Combine(
             Path.GetTempPath(),
@@ -21,6 +21,7 @@ public sealed class ConfigStoreTests
                 """
                 {
                   "Enabled": true,
+                  "EnablePartialAssist": true,
                   "DiagnosticLogging": true
                 }
                 """);
@@ -28,14 +29,17 @@ public sealed class ConfigStoreTests
             using var store = new ConfigStore(directory);
 
             Assert.True(store.Current.Enabled);
-            Assert.False(store.Current.EnablePartialAssist);
+            Assert.True(store.Current.EnableAssistMode);
             Assert.True(store.Current.DiagnosticLogging);
 
             using var document = JsonDocument.Parse(
                 File.ReadAllBytes(path));
-            Assert.False(document.RootElement
-                .GetProperty("EnablePartialAssist")
+            Assert.True(document.RootElement
+                .GetProperty("EnableAssistMode")
                 .GetBoolean());
+            Assert.False(document.RootElement.TryGetProperty(
+                "EnablePartialAssist",
+                out _));
         }
         finally
         {

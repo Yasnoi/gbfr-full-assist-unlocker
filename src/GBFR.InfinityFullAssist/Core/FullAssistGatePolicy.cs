@@ -17,7 +17,7 @@ public sealed class FullAssistGatePolicy
     public bool Decide(
         bool originalResult,
         bool enabled,
-        bool enablePartialAssist,
+        bool enableAssistMode,
         byte assistMode,
         in QuestSnapshot quest)
     {
@@ -27,7 +27,7 @@ public sealed class FullAssistGatePolicy
         }
 
         if (!enabled ||
-            !_assistModePolicy.IsUnlocked(assistMode, enablePartialAssist))
+            !_assistModePolicy.IsUnlocked(assistMode, enableAssistMode))
         {
             return false;
         }

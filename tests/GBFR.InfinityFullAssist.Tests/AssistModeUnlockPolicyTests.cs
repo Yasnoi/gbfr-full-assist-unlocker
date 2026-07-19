@@ -6,28 +6,28 @@ namespace GBFR.InfinityFullAssist.Tests;
 public sealed class AssistModeUnlockPolicyTests
 {
     private readonly AssistModeUnlockPolicy _policy = new(
-        VerifiedInfinityData.PartialAssistMode,
+        VerifiedInfinityData.AssistMode,
         VerifiedInfinityData.FullAssistMode);
 
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void FullAssistIsAlwaysUnlocked(bool enablePartialAssist) =>
+    public void FullAssistIsAlwaysUnlocked(bool enableAssistMode) =>
         Assert.True(_policy.IsUnlocked(
             VerifiedInfinityData.FullAssistMode,
-            enablePartialAssist));
+            enableAssistMode));
 
     [Fact]
-    public void PartialAssistRequiresItsSetting() =>
+    public void AssistModeRequiresItsSetting() =>
         Assert.False(_policy.IsUnlocked(
-            VerifiedInfinityData.PartialAssistMode,
-            enablePartialAssist: false));
+            VerifiedInfinityData.AssistMode,
+            enableAssistMode: false));
 
     [Fact]
-    public void PartialAssistIsUnlockedWhenItsSettingIsEnabled() =>
+    public void AssistModeIsUnlockedWhenItsSettingIsEnabled() =>
         Assert.True(_policy.IsUnlocked(
-            VerifiedInfinityData.PartialAssistMode,
-            enablePartialAssist: true));
+            VerifiedInfinityData.AssistMode,
+            enableAssistMode: true));
 
     [Theory]
     [InlineData(0)]
@@ -36,7 +36,7 @@ public sealed class AssistModeUnlockPolicyTests
     public void OtherAssistModesRemainLocked(byte assistMode) =>
         Assert.False(_policy.IsUnlocked(
             assistMode,
-            enablePartialAssist: true));
+            enableAssistMode: true));
 
     [Fact]
     public void DuplicateModeValuesAreRejected() =>

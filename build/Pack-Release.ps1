@@ -23,7 +23,7 @@ if ($LASTEXITCODE -ne 0) {
 $metadataPath = Join-Path $buildOutput 'ModConfig.json'
 $metadata = Get-Content -LiteralPath $metadataPath -Raw | ConvertFrom-Json
 $archivePath = Join-Path $artifactRoot (
-    "Infinity-Full-Assist-Unlock-$($metadata.ModVersion).zip")
+    "Infinity-Assist-Unlock-$($metadata.ModVersion).zip")
 
 New-Item -ItemType Directory -Path $artifactRoot -Force | Out-Null
 
