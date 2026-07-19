@@ -5,6 +5,7 @@ using GBFR.InfinityFullAssist.Runtime;
 using gbfrelink.utility.manager.Interfaces;
 using NenTools.Reloaded.ScanManager.Interfaces;
 using Reloaded.Mod.Interfaces;
+using Reloaded.Memory.Sigscan.Definitions;
 using IReloadedHooks = Reloaded.Hooks.ReloadedII.Interfaces.IReloadedHooks;
 
 namespace GBFR.InfinityFullAssist;
@@ -46,18 +47,53 @@ internal sealed class Mod : IDisposable
             return;
         }
 
-        var signatureDirectory = Path.Combine(
-            modLoader.GetDirectoryForModId(_modConfig.ModId),
-            "Signatures");
-        scanManager.InitializeScans(signatureDirectory, _modConfig.ModId);
+        if (!TryGetController(modLoader, out IScannerFactory scannerFactory))
+        {
+            LogFailure("IScannerFactory is unavailable; original behavior retained.");
+            return;
+        }
 
-        _gateHook = new FullAssistGateHook(
-            _logger,
-            _modConfig.ModId,
-            _configStore.Current,
-            hooks,
-            new ReloadedRuntimeMemoryReader());
-        _gateHook.RegisterScans(scanManager);
+        if (!TryCreateRuntimeSignatureScanner(
+                scannerFactory,
+                out var runtimeSignatureScanner,
+                out var moduleRange))
+        {
+            return;
+        }
+
+        try
+        {
+            var signatureDirectory = Path.Combine(
+                modLoader.GetDirectoryForModId(_modConfig.ModId),
+                "Signatures");
+            scanManager.InitializeScans(signatureDirectory, _modConfig.ModId);
+
+            _gateHook = new FullAssistGateHook(
+                _logger,
+                _modConfig.ModId,
+                _configStore.Current,
+                hooks,
+                new ReloadedRuntimeMemoryReader(),
+                runtimeSignatureScanner,
+                moduleRange);
+            _gateHook.RegisterScans(scanManager);
+        }
+        catch (Exception ex)
+        {
+            if (_gateHook is not null)
+            {
+                _gateHook.Dispose();
+                _gateHook = null;
+            }
+            else
+            {
+                runtimeSignatureScanner.Dispose();
+            }
+
+            LogFailure(
+                $"Runtime signature registration failed " +
+                $"({ex.GetType().Name}); original behavior retained.");
+        }
     }
 
     private bool TryGetUserDefinedParams(IModLoader modLoader, out IUserDefinedParams userDefinedParams)
@@ -103,35 +139,115 @@ internal sealed class Mod : IDisposable
                 return false;
             }
 
-            var executablePath = Environment.ProcessPath ??
-                Process.GetCurrentProcess().MainModule?.FileName;
-            if (string.IsNullOrWhiteSpace(executablePath))
-            {
-                LogFailure("The running executable path is unavailable; original behavior retained.");
-                return false;
-            }
-
-            var sha256 = BuildVerifier.ComputeSha256(executablePath);
-            var identity = new BuildIdentity(userDefinedParams.ApplicationVersion, sha256);
-            var supported = new BuildVerifier().IsSupported(identity);
+            var sha256 = TryComputeRunningExecutableSha256();
+            var identity = new BuildIdentity(
+                userDefinedParams.ApplicationVersion,
+                sha256);
+            var status = new BuildVerifier().Verify(identity);
 
             if (_configStore.Current.DiagnosticLogging)
             {
                 _logger.WriteLine(
-                    $"[{_modConfig.ModId}] ApplicationVersion={identity.ApplicationVersion}; SHA-256={identity.Sha256}");
+                    $"[{_modConfig.ModId}] " +
+                    $"ApplicationVersion={identity.ApplicationVersion}; " +
+                    $"SHA-256={identity.Sha256 ?? "unavailable"}");
             }
 
-            if (!supported)
+            if (status == BuildVerificationStatus.Unsupported)
             {
                 LogFailure(
-                    $"Unsupported build {identity.ApplicationVersion} / {identity.Sha256}; original behavior retained.");
+                    $"Unsupported ApplicationVersion " +
+                    $"{identity.ApplicationVersion}; original behavior retained.");
+                return false;
             }
 
-            return supported;
+            if (status == BuildVerificationStatus.Verified)
+            {
+                _logger.WriteLine(
+                    $"[{_modConfig.ModId}] Verified Endless Ragnarok 2.0.2 executable.",
+                    System.Drawing.Color.Green);
+            }
+            else
+            {
+                LogWarning(
+                    "The executable SHA-256 does not match the verified " +
+                    "build or could not be read. Runtime signature " +
+                    "validation will determine compatibility.");
+            }
+
+            return true;
         }
         catch (Exception ex)
         {
             LogFailure($"Build validation failed ({ex.GetType().Name}); original behavior retained.");
+            return false;
+        }
+    }
+
+    private static string? TryComputeRunningExecutableSha256()
+    {
+        try
+        {
+            var executablePath = Environment.ProcessPath ??
+                Process.GetCurrentProcess().MainModule?.FileName;
+            return string.IsNullOrWhiteSpace(executablePath)
+                ? null
+                : BuildVerifier.ComputeSha256(executablePath);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    private bool TryCreateRuntimeSignatureScanner(
+        IScannerFactory scannerFactory,
+        out RuntimeSignatureScanner scanner,
+        out ModuleAddressRange moduleRange)
+    {
+        scanner = null!;
+        moduleRange = default;
+
+        try
+        {
+            using var process = Process.GetCurrentProcess();
+            var mainModule = process.MainModule;
+            if (mainModule is null ||
+                mainModule.BaseAddress == 0 ||
+                mainModule.ModuleMemorySize <= 0)
+            {
+                LogFailure(
+                    "The main executable module is unavailable; original behavior retained.");
+                return false;
+            }
+
+            moduleRange = new ModuleAddressRange(
+                mainModule.BaseAddress,
+                mainModule.ModuleMemorySize);
+            var snapshotter = new RuntimeExecutableMemorySnapshotter(
+                new WindowsRuntimeMemoryRegionSource());
+            if (!snapshotter.TryCapture(
+                    moduleRange,
+                    out var snapshots,
+                    out var failure))
+            {
+                LogFailure(
+                    $"Executable memory snapshot failed: {failure}; " +
+                    "original behavior retained.");
+                return false;
+            }
+
+            scanner = new RuntimeSignatureScanner(
+                scannerFactory,
+                moduleRange,
+                snapshots);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            LogFailure(
+                $"Runtime signature scanner initialization failed " +
+                $"({ex.GetType().Name}); original behavior retained.");
             return false;
         }
     }
@@ -152,6 +268,11 @@ internal sealed class Mod : IDisposable
 
     private void LogFailure(string message) =>
         _logger.WriteLine($"[{_modConfig.ModId}] {message}", System.Drawing.Color.Red);
+
+    private void LogWarning(string message) =>
+        _logger.WriteLine(
+            $"[{_modConfig.ModId}] {message}",
+            System.Drawing.Color.Yellow);
 
     public void Dispose()
     {

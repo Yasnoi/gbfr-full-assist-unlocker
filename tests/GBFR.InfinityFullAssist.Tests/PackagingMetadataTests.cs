@@ -26,7 +26,7 @@ public sealed class PackagingMetadataTests
             "Infinity Assist Unlock",
             root.GetProperty("ModName").GetString());
         Assert.Equal("AkieGZH", root.GetProperty("ModAuthor").GetString());
-        Assert.Equal("1.2.0", root.GetProperty("ModVersion").GetString());
+        Assert.Equal("1.2.1", root.GetProperty("ModVersion").GetString());
         Assert.Contains(
             "Assist Mode and Full Assist Mode",
             root.GetProperty("ModDescription").GetString(),
@@ -126,19 +126,19 @@ public sealed class PackagingMetadataTests
         Assert.Contains("EnableAssistMode", chinese, StringComparison.Ordinal);
         Assert.Contains("EnableOnlineSessions", english, StringComparison.Ordinal);
         Assert.Contains("EnableOnlineSessions", chinese, StringComparison.Ordinal);
-        Assert.Contains("1.2.0", english, StringComparison.Ordinal);
-        Assert.Contains("1.2.0", chinese, StringComparison.Ordinal);
+        Assert.Contains("1.2.1", english, StringComparison.Ordinal);
+        Assert.Contains("1.2.1", chinese, StringComparison.Ordinal);
         Assert.Contains(
             "Assist Mode and Full Assist Mode",
             english,
             StringComparison.Ordinal);
         Assert.Contains("战斗辅助模式和战斗托管模式", chinese, StringComparison.Ordinal);
         Assert.Contains(
-            "Infinity-Assist-Unlock-1.2.0.zip",
+            "Infinity-Assist-Unlock-1.2.1.zip",
             english,
             StringComparison.Ordinal);
         Assert.Contains(
-            "Infinity-Assist-Unlock-1.2.0.zip",
+            "Infinity-Assist-Unlock-1.2.1.zip",
             chinese,
             StringComparison.Ordinal);
         Assert.Contains("Configure Mod", english, StringComparison.Ordinal);

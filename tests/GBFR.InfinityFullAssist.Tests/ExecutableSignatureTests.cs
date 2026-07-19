@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using GBFR.InfinityFullAssist.Core;
 using GBFR.InfinityFullAssist.Runtime;
 
 namespace GBFR.InfinityFullAssist.Tests;
@@ -32,6 +34,53 @@ public sealed class ExecutableSignatureTests
             executable,
             FullAssistGateHook.OnlineQuestModeSignature,
             expectedRawOffset: 0x3217900);
+
+        AssertMatchesAt(
+            executable,
+            FullAssistGateHook.GateValidationSignature,
+            expectedRawOffset: 0x218690);
+        AssertMatchesAt(
+            executable,
+            FullAssistGateHook.AssistDisableHandlerValidationSignature,
+            expectedRawOffset: 0x3207E30);
+        AssertMatchesAt(
+            executable,
+            FullAssistGateHook.OnlineQuestModeValidationSignature,
+            expectedRawOffset: 0x3217900);
+    }
+
+    [Fact]
+    public void UnrelatedByteChangeDoesNotInvalidateRuntimeSignatures()
+    {
+        var executablePath =
+            Environment.GetEnvironmentVariable("GBFR_TEST_EXECUTABLE") ??
+            DefaultExecutablePath;
+        if (!File.Exists(executablePath))
+        {
+            return;
+        }
+
+        var executable = File.ReadAllBytes(executablePath);
+        executable[0x100] ^= 0x01;
+        var changedHash = Convert.ToHexString(SHA256.HashData(executable));
+
+        Assert.Equal(
+            BuildVerificationStatus.Unverified,
+            new BuildVerifier().Verify(new BuildIdentity(
+                BuildVerifier.SupportedApplicationVersion,
+                changedHash)));
+        AssertUniqueAt(
+            executable,
+            FullAssistGateHook.GateSignature,
+            expectedRawOffset: 0x218690);
+        AssertUniqueAt(
+            executable,
+            FullAssistGateHook.AssistDisableHandlerSignature,
+            expectedRawOffset: 0x3207E30);
+        AssertUniqueAt(
+            executable,
+            FullAssistGateHook.OnlineQuestModeSignature,
+            expectedRawOffset: 0x3217900);
     }
 
     private static void AssertUniqueAt(
@@ -39,14 +88,7 @@ public sealed class ExecutableSignatureTests
         string signature,
         int expectedRawOffset)
     {
-        var tokens = signature.Split(
-            ' ',
-            StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var pattern = tokens
-            .Select(token => token is "?" or "??"
-                ? (byte?)null
-                : Convert.ToByte(token, 16))
-            .ToArray();
+        var pattern = ParsePattern(signature);
         var matches = new List<int>();
         var fixedRuns = new List<(int Offset, byte[] Bytes)>();
         var runStart = -1;
@@ -106,4 +148,32 @@ public sealed class ExecutableSignatureTests
 
         Assert.Equal([expectedRawOffset], matches);
     }
+
+    private static void AssertMatchesAt(
+        byte[] executable,
+        string signature,
+        int expectedRawOffset)
+    {
+        var pattern = ParsePattern(signature);
+        Assert.True(expectedRawOffset + pattern.Length <= executable.Length);
+
+        for (var index = 0; index < pattern.Length; index++)
+        {
+            if (pattern[index] is { } expected)
+            {
+                Assert.Equal(expected, executable[expectedRawOffset + index]);
+            }
+        }
+    }
+
+    private static byte?[] ParsePattern(string signature) =>
+        signature
+            .Split(
+                ' ',
+                StringSplitOptions.RemoveEmptyEntries |
+                StringSplitOptions.TrimEntries)
+            .Select(token => token is "?" or "??"
+                ? (byte?)null
+                : Convert.ToByte(token, 16))
+            .ToArray();
 }

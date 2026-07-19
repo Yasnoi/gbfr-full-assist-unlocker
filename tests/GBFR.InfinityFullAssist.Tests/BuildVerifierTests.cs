@@ -7,28 +7,46 @@ public sealed class BuildVerifierTests
     private readonly BuildVerifier _verifier = new();
 
     [Fact]
-    public void ExactVersionAndHashAreAccepted()
+    public void ExactVersionAndHashAreVerified()
     {
         var identity = new BuildIdentity(
             BuildVerifier.SupportedApplicationVersion,
             BuildVerifier.SupportedSha256.ToLowerInvariant());
 
-        Assert.True(_verifier.IsSupported(identity));
+        Assert.Equal(
+            BuildVerificationStatus.Verified,
+            _verifier.Verify(identity));
     }
 
     [Fact]
-    public void DifferentVersionIsRejected()
+    public void DifferentVersionIsUnsupported()
     {
         var identity = new BuildIdentity(new Version(2, 0, 3), BuildVerifier.SupportedSha256);
 
-        Assert.False(_verifier.IsSupported(identity));
+        Assert.Equal(
+            BuildVerificationStatus.Unsupported,
+            _verifier.Verify(identity));
     }
 
     [Fact]
-    public void DifferentHashIsRejected()
+    public void DifferentHashIsUnverifiedButNotUnsupported()
     {
         var identity = new BuildIdentity(BuildVerifier.SupportedApplicationVersion, new string('0', 64));
 
-        Assert.False(_verifier.IsSupported(identity));
+        Assert.Equal(
+            BuildVerificationStatus.Unverified,
+            _verifier.Verify(identity));
+    }
+
+    [Fact]
+    public void UnavailableHashIsUnverifiedButNotUnsupported()
+    {
+        var identity = new BuildIdentity(
+            BuildVerifier.SupportedApplicationVersion,
+            Sha256: null);
+
+        Assert.Equal(
+            BuildVerificationStatus.Unverified,
+            _verifier.Verify(identity));
     }
 }

@@ -8,9 +8,20 @@ public sealed class BuildVerifier
     public const string SupportedSha256 =
         "63340832BCF731FBC97796F686B05C988418E83D451D4A49B2244A85D00E297F";
 
-    public bool IsSupported(in BuildIdentity identity) =>
-        identity.ApplicationVersion == SupportedApplicationVersion &&
-        string.Equals(identity.Sha256, SupportedSha256, StringComparison.OrdinalIgnoreCase);
+    public BuildVerificationStatus Verify(in BuildIdentity identity)
+    {
+        if (identity.ApplicationVersion != SupportedApplicationVersion)
+        {
+            return BuildVerificationStatus.Unsupported;
+        }
+
+        return string.Equals(
+            identity.Sha256,
+            SupportedSha256,
+            StringComparison.OrdinalIgnoreCase)
+            ? BuildVerificationStatus.Verified
+            : BuildVerificationStatus.Unverified;
+    }
 
     public static string ComputeSha256(string executablePath)
     {

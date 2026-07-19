@@ -13,6 +13,7 @@
     <PackageReference Include="NenTools.Reloaded.ScanManager.Interfaces" Version="1.0.0" />
     <PackageReference Include="Reloaded.Memory" Version="9.4.1" />
     <PackageReference Include="Reloaded.Memory.SigScan.ReloadedII.Interfaces" Version="1.2.0" />
+    <PackageReference Include="Reloaded.Memory.Sigscan.Definitions" Version="1.1.0" />
     <PackageReference Include="Reloaded.Mod.Interfaces" Version="2.4.0" ExcludeAssets="runtime" />
     <PackageReference Include="Reloaded.SharedLib.Hooks" Version="1.9.0" />
   </ItemGroup>
