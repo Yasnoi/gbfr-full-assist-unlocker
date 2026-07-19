@@ -17,7 +17,9 @@ public sealed class FullAssistGatePolicyTests
             originalResult: true,
             enabled: false,
             enableAssistMode: false,
+            enableOnlineSessions: false,
             assistMode: 0,
+            onlineState: QuestOnlineState.Unknown,
             new(QuestTypeResolution.NonInfinity, 0)));
 
     [Fact]
@@ -26,7 +28,9 @@ public sealed class FullAssistGatePolicyTests
             originalResult: false,
             enabled: false,
             enableAssistMode: true,
+            enableOnlineSessions: true,
             VerifiedInfinityData.AssistMode,
+            QuestOnlineState.Online,
             new(QuestTypeResolution.Infinity, 0)));
 
     [Fact]
@@ -35,7 +39,9 @@ public sealed class FullAssistGatePolicyTests
             originalResult: false,
             enabled: true,
             enableAssistMode: true,
+            enableOnlineSessions: true,
             assistMode: 0,
+            onlineState: QuestOnlineState.Online,
             new(QuestTypeResolution.Infinity, 0)));
 
     [Fact]
@@ -44,7 +50,9 @@ public sealed class FullAssistGatePolicyTests
             originalResult: false,
             enabled: true,
             enableAssistMode: false,
+            enableOnlineSessions: true,
             VerifiedInfinityData.FullAssistMode,
+            QuestOnlineState.Online,
             new(QuestTypeResolution.Infinity, 0)));
 
     [Fact]
@@ -53,7 +61,9 @@ public sealed class FullAssistGatePolicyTests
             originalResult: false,
             enabled: true,
             enableAssistMode: false,
+            enableOnlineSessions: true,
             VerifiedInfinityData.AssistMode,
+            QuestOnlineState.Online,
             new(QuestTypeResolution.Infinity, 0)));
 
     [Fact]
@@ -62,7 +72,9 @@ public sealed class FullAssistGatePolicyTests
             originalResult: false,
             enabled: true,
             enableAssistMode: true,
+            enableOnlineSessions: true,
             VerifiedInfinityData.AssistMode,
+            QuestOnlineState.Online,
             new(QuestTypeResolution.Infinity, 0)));
 
     [Theory]
@@ -75,6 +87,42 @@ public sealed class FullAssistGatePolicyTests
             originalResult: false,
             enabled: true,
             enableAssistMode,
+            enableOnlineSessions: true,
             assistMode,
+            onlineState: QuestOnlineState.Online,
             new(QuestTypeResolution.NonInfinity, 0)));
+
+    [Theory]
+    [InlineData(QuestOnlineState.Offline, true)]
+    [InlineData(QuestOnlineState.Online, false)]
+    [InlineData(QuestOnlineState.Unknown, false)]
+    public void DisabledOnlineSessionsOnlyUnlocksKnownOfflineQuests(
+        QuestOnlineState onlineState,
+        bool expected) =>
+        Assert.Equal(
+            expected,
+            _policy.Decide(
+                originalResult: false,
+                enabled: true,
+                enableAssistMode: false,
+                enableOnlineSessions: false,
+                VerifiedInfinityData.FullAssistMode,
+                onlineState,
+                new(QuestTypeResolution.Infinity, 0)));
+
+    [Theory]
+    [InlineData(QuestOnlineState.Offline)]
+    [InlineData(QuestOnlineState.Online)]
+    [InlineData(QuestOnlineState.Unknown)]
+    public void EnabledOnlineSessionsDoesNotRequireSessionState(
+        QuestOnlineState onlineState) =>
+        Assert.True(
+            _policy.Decide(
+                originalResult: false,
+                enabled: true,
+                enableAssistMode: false,
+                enableOnlineSessions: true,
+                VerifiedInfinityData.FullAssistMode,
+                onlineState,
+                new(QuestTypeResolution.Infinity, 0)));
 }

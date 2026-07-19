@@ -33,7 +33,7 @@ internal sealed class ConfigStore : IDisposable
         {
             var json = File.ReadAllBytes(_path);
             config = Config.Deserialize(json);
-            if (!ContainsAssistModeSetting(json))
+            if (!ContainsCurrentSettings(json))
             {
                 Write(config);
             }
@@ -47,12 +47,12 @@ internal sealed class ConfigStore : IDisposable
         return config;
     }
 
-    private static bool ContainsAssistModeSetting(ReadOnlyMemory<byte> json)
+    private static bool ContainsCurrentSettings(ReadOnlyMemory<byte> json)
     {
         using var document = JsonDocument.Parse(json);
-        return document.RootElement.TryGetProperty(
-            nameof(Config.EnableAssistMode),
-            out _);
+        var root = document.RootElement;
+        return root.TryGetProperty(nameof(Config.EnableAssistMode), out _) &&
+               root.TryGetProperty(nameof(Config.EnableOnlineSessions), out _);
     }
 
     private void Write(Config config) =>

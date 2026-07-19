@@ -15,6 +15,7 @@ internal sealed class FullAssistGateHook : IDisposable
     private const string GateScanName = "FullAssistGate";
     private const string AssistDisableHandlerScanName =
         "AssistDisableTermHandler";
+    private const string OnlineQuestModeScanName = "OnlineQuestMode";
 
     internal const string GateSignature =
         "48 83 EC 28 48 8B 0D ?? ?? ?? ?? 48 8D 54 24 24 E8 ?? ?? ?? ?? " +
@@ -25,9 +26,15 @@ internal sealed class FullAssistGateHook : IDisposable
         "88 88 4E 0E 00 00 48 8B 3D ?? ?? ?? ?? 31 F6 E8 ?? ?? ?? ?? " +
         "B9 00 00 00 00 84 C0 74 ?? 8B 47 10";
 
+    internal const string OnlineQuestModeSignature =
+        "48 83 79 10 00 74 ?? 48 8B 05 ?? ?? ?? ?? 8B 48 04 " +
+        "B0 01 83 F9 03 74 ?? 31 C0 C3";
+
     private static readonly BytePattern GatePattern = BytePattern.Parse(GateSignature);
     private static readonly BytePattern AssistDisableHandlerPattern =
         BytePattern.Parse(AssistDisableHandlerSignature);
+    private static readonly BytePattern OnlineQuestModePattern =
+        BytePattern.Parse(OnlineQuestModeSignature);
 
     private readonly ILogger _logger;
     private readonly string _modId;
@@ -42,6 +49,8 @@ internal sealed class FullAssistGateHook : IDisposable
     private Config _config;
     private nint _gateAddress;
     private nint _assistDisableTermHandlerAddress;
+    private nint _onlineQuestModeAddress;
+    private nint _onlineQuestModeGlobalPointer;
     private QuestRuntimeStateReader? _stateReader;
     private IHook<FullAssistGateDelegate>? _gateHook;
     private DecisionLogKey? _lastDecisionLog;
@@ -103,11 +112,20 @@ internal sealed class FullAssistGateHook : IDisposable
                 _assistDisableTermHandlerAddress = address;
                 TryInstall();
             });
+        scanManager.AddScan(
+            OnlineQuestModeScanName,
+            SignatureGroup,
+            address =>
+            {
+                _onlineQuestModeAddress = address;
+                TryInitializeOnlineQuestModeState();
+            });
     }
 
     internal bool EvaluateForTests(
         bool originalResult,
         byte assistMode,
+        QuestOnlineState onlineState,
         QuestSnapshot snapshot)
     {
         var config = Volatile.Read(ref _config);
@@ -115,7 +133,9 @@ internal sealed class FullAssistGateHook : IDisposable
             originalResult,
             config.Enabled,
             config.EnableAssistMode,
+            config.EnableOnlineSessions,
             assistMode,
+            onlineState,
             snapshot);
     }
 
@@ -167,6 +187,7 @@ internal sealed class FullAssistGateHook : IDisposable
                     _memory,
                     questStateGlobalPointer,
                     assistSelectionGlobalPointer,
+                    Volatile.Read(ref _onlineQuestModeGlobalPointer),
                     questIdGetter);
 
                 var hook = _hooks.CreateHook<FullAssistGateDelegate>(
@@ -195,6 +216,36 @@ internal sealed class FullAssistGateHook : IDisposable
                 LogFailure(
                     $"Hook installation failed ({ex.GetType().Name}).");
             }
+        }
+    }
+
+    private void TryInitializeOnlineQuestModeState()
+    {
+        lock (_installLock)
+        {
+            var bytes = new byte[OnlineQuestModePattern.Length];
+            if (!_memory.TryReadBytes(_onlineQuestModeAddress, bytes) ||
+                !OnlineQuestModePattern.Matches(bytes))
+            {
+                LogOnlineStateFailure(
+                    "OnlineQuestMode opcode validation failed.");
+                return;
+            }
+
+            if (!TryResolveRipRelativeAddress(
+                    _onlineQuestModeAddress + 0x7,
+                    displacementOffset: 3,
+                    instructionLength: 7,
+                    out var globalPointer))
+            {
+                LogOnlineStateFailure(
+                    "Failed to resolve the verified online Quest mode state pointer.");
+                return;
+            }
+
+            Volatile.Write(ref _onlineQuestModeGlobalPointer, globalPointer);
+            Volatile.Read(ref _stateReader)?
+                .UpdateOnlineQuestModeGlobalPointer(globalPointer);
         }
     }
 
@@ -243,7 +294,9 @@ internal sealed class FullAssistGateHook : IDisposable
                 originalResult: false,
                 enabled: config.Enabled,
                 enableAssistMode: config.EnableAssistMode,
+                enableOnlineSessions: config.EnableOnlineSessions,
                 assistMode: state.AssistMode,
+                onlineState: state.OnlineState,
                 quest);
             var finalResult = result ? (byte)1 : originalResult;
 
@@ -335,6 +388,7 @@ internal sealed class FullAssistGateHook : IDisposable
             state.QuestId,
             state.AssistMode,
             state.DisableAssistTerm,
+            state.OnlineState,
             typeResolution,
             originalResult,
             finalResult);
@@ -354,6 +408,7 @@ internal sealed class FullAssistGateHook : IDisposable
                 $"state={(stateReadable ? "readable" : "unavailable")}; " +
                 $"quest=0x{state.QuestId:X6}; type={typeResolution}; " +
                 $"assistMode={assistMode}; " +
+                $"session={state.OnlineState}; " +
                 $"disableTerm={state.DisableAssistTerm?.ToString() ?? "unavailable"}; " +
                 $"original={originalResult != 0}; final={finalResult != 0}");
         }
@@ -363,6 +418,11 @@ internal sealed class FullAssistGateHook : IDisposable
         _logger.WriteLine(
             $"[{_modId}] {message} Original behavior retained.",
             System.Drawing.Color.Red);
+
+    private void LogOnlineStateFailure(string message) =>
+        _logger.WriteLine(
+            $"[{_modId}] {message} Online Quest state will be treated as unavailable.",
+            System.Drawing.Color.Yellow);
 
     public void Dispose()
     {
@@ -379,6 +439,7 @@ internal sealed class FullAssistGateHook : IDisposable
         uint QuestId,
         byte AssistMode,
         bool? DisableAssistTerm,
+        QuestOnlineState OnlineState,
         QuestTypeResolution TypeResolution,
         byte OriginalResult,
         byte FinalResult);

@@ -10,7 +10,7 @@
 
 - 只对 Infinity 副本生效。
 - 战斗辅助模式可以单独开启，战斗托管模式默认可用。
-- 支持单人和联机，Host 与 Guest 均可使用。
+- 默认支持单人和联机，Host 与 Guest 均可使用，也可以在模组设置中关闭联机支持。
 - 不影响其他难度或其他辅助模式。
 - 不修改伤害、奖励、掉落、存档或网络状态。
 
@@ -42,7 +42,7 @@ SHA-256: 63340832BCF731FBC97796F686B05C988418E83D451D4A49B2244A85D00E297F
 
 1. 在 Reloaded-II 中添加 `granblue_fantasy_relink.exe`。
 2. 安装并启用 Granblue Fantasy Relink Mod Manager。
-3. 将 `Infinity-Assist-Unlock-1.1.1.zip` 拖入 Reloaded-II。
+3. 将 `Infinity-Assist-Unlock-1.2.0.zip` 拖入 Reloaded-II。
 4. 为游戏启用 **Infinity Assist Unlock**。
 5. 通过 Reloaded-II 启动游戏。
 6. 在进入 Infinity 副本前，将游戏的辅助模式设为“战斗辅助模式”或“战斗托管模式”。
@@ -63,12 +63,14 @@ Reloaded-II\Mods\gbfr.qol.infinityfullassist
 {
   "Enabled": true,
   "EnableAssistMode": false,
+  "EnableOnlineSessions": true,
   "DiagnosticLogging": false
 }
 ```
 
 - `Enabled`：开启或关闭模组功能。
 - `EnableAssistMode`：同时允许战斗辅助模式。默认关闭，战斗托管模式不受这个设置影响。
+- `EnableOnlineSessions`：允许模组在联机 Infinity 副本中生效，Host 与 Guest 均适用。默认开启；关闭后模组只在单人副本中生效。
 - `DiagnosticLogging`：在 Reloaded-II 日志中记录诊断信息。只有排查问题时才需要开启。
 
 也可以直接编辑 `Config.json`。游戏运行期间保存配置后，模组会自动重新加载。
@@ -82,11 +84,11 @@ Reloaded-II\Mods\gbfr.qol.infinityfullassist
 - Lucilius
 - Bahamut Versa
 
-战斗辅助模式已经完成游戏内测试，战斗托管模式在单人和联机模式下都可以正常启用。
+战斗辅助模式已经完成游戏内测试。开启联机支持时，战斗托管模式在单人和联机模式下都可以正常启用。
 
 ## 工作原理
 
-模组先保留游戏原本的判断逻辑。只有游戏准备禁用战斗辅助模式或战斗托管模式时，它才检查玩家选择的模式、是否已经按需开启 `EnableAssistMode`，以及当前副本是否属于 Infinity。识别 Infinity 时优先使用副本类型；类型无法读取时，再查询已经确认的副本列表。任何信息不完整的情况都会保持游戏原本的结果。
+模组先保留游戏原本的判断逻辑。只有游戏准备禁用战斗辅助模式或战斗托管模式时，它才检查玩家选择的模式、是否已经按需开启 `EnableAssistMode`、当前副本是否属于 Infinity，以及 `EnableOnlineSessions` 是否允许当前会话。识别 Infinity 时优先使用副本类型；类型无法读取时，再查询已经确认的副本列表。任何信息不完整的情况都会保持游戏原本的结果。
 
 模组按 Infinity 类型识别副本，因此如果后续版本更新了其他 Infinity 副本时，模组不需要依赖显示名称，也应该能够正常生效。
 
@@ -108,7 +110,7 @@ Reloaded-II\Mods\gbfr.qol.infinityfullassist
 
 ### Infinity 中仍然无法使用托管模式
 
-使用战斗辅助模式时，还需要在模组设置中打开 `EnableAssistMode`。使用战斗托管模式时，确认游戏设置中已经选择“战斗托管模式”。随后可以打开 `DiagnosticLogging`，重新进入一次副本并查看 Reloaded-II 日志。
+使用战斗辅助模式时，还需要在模组设置中打开 `EnableAssistMode`。使用战斗托管模式时，确认游戏设置中已经选择“战斗托管模式”。如果是联机副本，还需要确认 `EnableOnlineSessions` 已开启。随后可以打开 `DiagnosticLogging`，重新进入一次副本并查看 Reloaded-II 日志。
 
 ### 游戏更新后模组停止工作
 

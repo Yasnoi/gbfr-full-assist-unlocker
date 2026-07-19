@@ -18,7 +18,9 @@ public sealed class FullAssistGatePolicy
         bool originalResult,
         bool enabled,
         bool enableAssistMode,
+        bool enableOnlineSessions,
         byte assistMode,
+        QuestOnlineState onlineState,
         in QuestSnapshot quest)
     {
         if (originalResult)
@@ -32,6 +34,12 @@ public sealed class FullAssistGatePolicy
             return false;
         }
 
-        return _classifier.IsInfinity(quest);
+        if (!_classifier.IsInfinity(quest))
+        {
+            return false;
+        }
+
+        return enableOnlineSessions ||
+               onlineState == QuestOnlineState.Offline;
     }
 }

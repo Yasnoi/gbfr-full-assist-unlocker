@@ -20,6 +20,11 @@ public sealed class Config : IConfigurable
     [DefaultValue(false)]
     public bool EnableAssistMode { get; set; }
 
+    [DisplayName("Enable in Online Sessions")]
+    [Description("Allow the built-in Assist Mode and Full Assist Mode in online Infinity quest sessions, including for Hosts and Guests.")]
+    [DefaultValue(true)]
+    public bool EnableOnlineSessions { get; set; } = true;
+
     [DisplayName("Diagnostic Logging")]
     [Description("Log build validation and one decision record per quest entry. Does not change behavior.")]
     [DefaultValue(false)]

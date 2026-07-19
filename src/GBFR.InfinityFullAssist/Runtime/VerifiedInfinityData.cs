@@ -9,6 +9,7 @@ internal static class VerifiedInfinityData
     public const int InfinitySubCategory = 11;
     public const byte AssistMode = 1;
     public const byte FullAssistMode = 2;
+    public const uint OnlineQuestMode = 3;
 
     // These are the only quest IDs referenced by the 2.0.2 quest_infinity UI assets.
     public static ReadOnlySpan<uint> FallbackQuestIds =>

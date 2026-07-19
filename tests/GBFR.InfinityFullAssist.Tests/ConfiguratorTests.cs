@@ -39,11 +39,13 @@ public sealed class ConfiguratorTests
             Assert.Equal("Mod Configuration", config.ConfigName);
             Assert.True(config.Enabled);
             Assert.False(config.EnableAssistMode);
+            Assert.True(config.EnableOnlineSessions);
             Assert.False(config.DiagnosticLogging);
             Assert.NotNull(config.Save);
 
             config.Enabled = false;
             config.EnableAssistMode = true;
+            config.EnableOnlineSessions = false;
             config.DiagnosticLogging = true;
             config.Save();
 
@@ -54,12 +56,15 @@ public sealed class ConfiguratorTests
             Assert.False(root.GetProperty("Enabled").GetBoolean());
             Assert.True(
                 root.GetProperty("EnableAssistMode").GetBoolean());
+            Assert.False(
+                root.GetProperty("EnableOnlineSessions").GetBoolean());
             Assert.True(
                 root.GetProperty("DiagnosticLogging").GetBoolean());
 
             using var runtimeStore = new ConfigStore(directory);
             Assert.False(runtimeStore.Current.Enabled);
             Assert.True(runtimeStore.Current.EnableAssistMode);
+            Assert.False(runtimeStore.Current.EnableOnlineSessions);
             Assert.True(runtimeStore.Current.DiagnosticLogging);
         }
         finally

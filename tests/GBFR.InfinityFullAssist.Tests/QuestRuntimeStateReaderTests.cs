@@ -1,4 +1,5 @@
 using GBFR.InfinityFullAssist.Runtime;
+using GBFR.InfinityFullAssist.Core;
 
 namespace GBFR.InfinityFullAssist.Tests;
 
@@ -8,6 +9,8 @@ public sealed class QuestRuntimeStateReaderTests
     private static readonly nint QuestState = 0x200000;
     private static readonly nint AssistSelectionGlobal = 0x300000;
     private static readonly nint AssistSelection = 0x400000;
+    private static readonly nint OnlineQuestModeGlobal = 0x500000;
+    private static readonly nint OnlineQuestModeState = 0x600000;
 
     [Fact]
     public void ReadsQuestThroughGameGetterAndAssistModeFromCallerState()
@@ -20,11 +23,17 @@ public sealed class QuestRuntimeStateReaderTests
                 VerifiedInfinityData.FullAssistMode)
             .WithByte(
                 QuestState + QuestRuntimeStateReader.DisableAssistTermOffset,
-                1);
+                1)
+            .WithPointer(OnlineQuestModeGlobal, OnlineQuestModeState)
+            .WithUInt32(
+                OnlineQuestModeState +
+                QuestRuntimeStateReader.OnlineQuestModeOffset,
+                VerifiedInfinityData.OnlineQuestMode);
         var reader = new QuestRuntimeStateReader(
             memory,
             QuestGlobal,
             AssistSelectionGlobal,
+            OnlineQuestModeGlobal,
             (nint state, out uint questId) =>
             {
                 Assert.Equal(QuestState, state);
@@ -35,6 +44,7 @@ public sealed class QuestRuntimeStateReaderTests
         Assert.Equal(0x40B301u, result.QuestId);
         Assert.Equal(VerifiedInfinityData.FullAssistMode, result.AssistMode);
         Assert.True(result.DisableAssistTerm);
+        Assert.Equal(QuestOnlineState.Online, result.OnlineState);
     }
 
     [Fact]
@@ -44,6 +54,7 @@ public sealed class QuestRuntimeStateReaderTests
             new FakeRuntimeMemoryReader(),
             QuestGlobal,
             AssistSelectionGlobal,
+            OnlineQuestModeGlobal,
             (nint _, out uint questId) => questId = 0x40B301);
 
         Assert.False(reader.TryRead(out _));
@@ -62,10 +73,12 @@ public sealed class QuestRuntimeStateReaderTests
             memory,
             QuestGlobal,
             AssistSelectionGlobal,
+            OnlineQuestModeGlobal,
             (nint _, out uint questId) => questId = 0x40B316);
 
         Assert.True(reader.TryRead(out var result));
         Assert.Null(result.DisableAssistTerm);
+        Assert.Equal(QuestOnlineState.Unknown, result.OnlineState);
     }
 
     [Fact]
@@ -81,6 +94,7 @@ public sealed class QuestRuntimeStateReaderTests
             memory,
             QuestGlobal,
             AssistSelectionGlobal,
+            OnlineQuestModeGlobal,
             (nint _, out uint questId) =>
             {
                 questId = 0;
@@ -88,6 +102,61 @@ public sealed class QuestRuntimeStateReaderTests
             });
 
         Assert.False(reader.TryRead(out _));
+    }
+
+    [Fact]
+    public void ReadableNonOnlineQuestModeIsOffline()
+    {
+        var memory = new FakeRuntimeMemoryReader()
+            .WithPointer(QuestGlobal, QuestState)
+            .WithPointer(AssistSelectionGlobal, AssistSelection)
+            .WithByte(
+                AssistSelection + QuestRuntimeStateReader.AssistModeOffset,
+                VerifiedInfinityData.FullAssistMode)
+            .WithPointer(OnlineQuestModeGlobal, OnlineQuestModeState)
+            .WithUInt32(
+                OnlineQuestModeState +
+                QuestRuntimeStateReader.OnlineQuestModeOffset,
+                0);
+        var reader = new QuestRuntimeStateReader(
+            memory,
+            QuestGlobal,
+            AssistSelectionGlobal,
+            OnlineQuestModeGlobal,
+            (nint _, out uint questId) => questId = 0x40B301);
+
+        Assert.True(reader.TryRead(out var result));
+        Assert.Equal(QuestOnlineState.Offline, result.OnlineState);
+    }
+
+    [Fact]
+    public void OnlineQuestModePointerCanBeProvidedAfterConstruction()
+    {
+        var memory = new FakeRuntimeMemoryReader()
+            .WithPointer(QuestGlobal, QuestState)
+            .WithPointer(AssistSelectionGlobal, AssistSelection)
+            .WithByte(
+                AssistSelection + QuestRuntimeStateReader.AssistModeOffset,
+                VerifiedInfinityData.FullAssistMode)
+            .WithPointer(OnlineQuestModeGlobal, OnlineQuestModeState)
+            .WithUInt32(
+                OnlineQuestModeState +
+                QuestRuntimeStateReader.OnlineQuestModeOffset,
+                VerifiedInfinityData.OnlineQuestMode);
+        var reader = new QuestRuntimeStateReader(
+            memory,
+            QuestGlobal,
+            AssistSelectionGlobal,
+            onlineQuestModeGlobalPointer: 0,
+            (nint _, out uint questId) => questId = 0x40B301);
+
+        Assert.True(reader.TryRead(out var beforeUpdate));
+        Assert.Equal(QuestOnlineState.Unknown, beforeUpdate.OnlineState);
+
+        reader.UpdateOnlineQuestModeGlobalPointer(OnlineQuestModeGlobal);
+
+        Assert.True(reader.TryRead(out var afterUpdate));
+        Assert.Equal(QuestOnlineState.Online, afterUpdate.OnlineState);
     }
 
     private sealed class FakeRuntimeMemoryReader : IRuntimeMemoryReader

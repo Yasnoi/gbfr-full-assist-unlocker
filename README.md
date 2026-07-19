@@ -15,7 +15,8 @@ mechanics.
 - Applies only to Infinity quests.
 - Assist Mode can be enabled separately; Full Assist Mode is available by
   default.
-- Works in solo and online sessions for both Hosts and Guests.
+- Works in solo and online sessions for both Hosts and Guests by default.
+  Online-session support can be disabled in the mod settings.
 - Does not affect other difficulties or Assist modes.
 - Does not modify damage, rewards, drops, save data, or network state.
 
@@ -51,7 +52,7 @@ imported.
 
 1. Add `granblue_fantasy_relink.exe` to Reloaded-II.
 2. Install and enable Granblue Fantasy Relink Mod Manager.
-3. Drag `Infinity-Assist-Unlock-1.1.1.zip` into Reloaded-II.
+3. Drag `Infinity-Assist-Unlock-1.2.0.zip` into Reloaded-II.
 4. Enable **Infinity Assist Unlock** for the game.
 5. Launch the game through Reloaded-II.
 6. Set Assist Mode to **Assist Mode** or **Full Assist Mode** before
@@ -74,6 +75,7 @@ directory when the settings are saved.
 {
   "Enabled": true,
   "EnableAssistMode": false,
+  "EnableOnlineSessions": true,
   "DiagnosticLogging": false
 }
 ```
@@ -81,6 +83,9 @@ directory when the settings are saved.
 - `Enabled`: turns the mod on or off.
 - `EnableAssistMode`: also allows Assist Mode. It is off by default
   and does not affect Full Assist Mode.
+- `EnableOnlineSessions`: allows the mod to work in online Infinity quests for
+  both Hosts and Guests. It is on by default. Turn it off to limit the mod to
+  solo quests.
 - `DiagnosticLogging`: writes diagnostic information to the Reloaded-II log.
   Enable it only when troubleshooting.
 
@@ -96,18 +101,19 @@ The following Infinity quests have been tested:
 - Lucilius
 - Bahamut Versa
 
-Assist Mode has been confirmed in game. Full Assist Mode worked in both solo
-and online sessions.
+Assist Mode has been confirmed in game. With online-session support enabled,
+Full Assist Mode worked in both solo and online sessions.
 
 ## How it works
 
 The mod preserves the game's original checks. It only steps in when the game
 is about to disable Assist Mode or Full Assist Mode, then checks which mode
 the player selected, whether `EnableAssistMode` is turned on when
-needed, and whether the current quest is an Infinity quest. It identifies
-Infinity quests by quest type first. If that type cannot be read, it falls
-back to a list of confirmed quests. When the necessary information is
-incomplete, the game's original result is left unchanged.
+needed, whether the current quest is an Infinity quest, and whether the
+current session is allowed by `EnableOnlineSessions`. It identifies Infinity
+quests by quest type first. If that type cannot be read, it falls back to a
+list of confirmed quests. When the necessary information is incomplete, the
+game's original result is left unchanged.
 
 Because quests are identified by their Infinity type, the mod does not depend
 on their displayed names and should also work with other Infinity quests added
@@ -140,6 +146,7 @@ versions of SigScan or Universal Redirector can prevent the mod from loading.
 
 For Assist Mode, also turn on `EnableAssistMode` in the mod settings. For Full
 Assist Mode, make sure **Full Assist Mode** is selected in the game settings.
+If the quest is online, also make sure `EnableOnlineSessions` is turned on.
 You can then enable `DiagnosticLogging`, enter the quest again, and check the
 Reloaded-II log.
 

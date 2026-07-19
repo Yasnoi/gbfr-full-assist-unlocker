@@ -28,6 +28,10 @@ public sealed class ExecutableSignatureTests
             executable,
             FullAssistGateHook.AssistDisableHandlerSignature,
             expectedRawOffset: 0x3207E30);
+        AssertUniqueAt(
+            executable,
+            FullAssistGateHook.OnlineQuestModeSignature,
+            expectedRawOffset: 0x3217900);
     }
 
     private static void AssertUniqueAt(

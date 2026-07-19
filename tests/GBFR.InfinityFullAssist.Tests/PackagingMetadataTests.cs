@@ -26,7 +26,7 @@ public sealed class PackagingMetadataTests
             "Infinity Assist Unlock",
             root.GetProperty("ModName").GetString());
         Assert.Equal("AkieGZH", root.GetProperty("ModAuthor").GetString());
-        Assert.Equal("1.1.1", root.GetProperty("ModVersion").GetString());
+        Assert.Equal("1.2.0", root.GetProperty("ModVersion").GetString());
         Assert.Contains(
             "Assist Mode and Full Assist Mode",
             root.GetProperty("ModDescription").GetString(),
@@ -50,7 +50,7 @@ public sealed class PackagingMetadataTests
     }
 
     [Fact]
-    public void UserConfigurationSerializesOnlyTheThreePublicSettings()
+    public void UserConfigurationSerializesOnlyTheFourPublicSettings()
     {
         using var document = JsonDocument.Parse(
             JsonSerializer.Serialize(new Config()));
@@ -60,11 +60,20 @@ public sealed class PackagingMetadataTests
             .ToArray();
 
         Assert.Equal(
-            ["Enabled", "EnableAssistMode", "DiagnosticLogging"],
+            [
+                "Enabled",
+                "EnableAssistMode",
+                "EnableOnlineSessions",
+                "DiagnosticLogging"
+            ],
             propertyNames);
         Assert.True(document.RootElement.GetProperty("Enabled").GetBoolean());
         Assert.False(
             document.RootElement.GetProperty("EnableAssistMode").GetBoolean());
+        Assert.True(
+            document.RootElement
+                .GetProperty("EnableOnlineSessions")
+                .GetBoolean());
         Assert.False(
             document.RootElement.GetProperty("DiagnosticLogging").GetBoolean());
     }
@@ -83,6 +92,10 @@ public sealed class PackagingMetadataTests
         Assert.Contains(FullAssistGateHook.GateSignature, text, StringComparison.Ordinal);
         Assert.Contains(
             FullAssistGateHook.AssistDisableHandlerSignature,
+            text,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            FullAssistGateHook.OnlineQuestModeSignature,
             text,
             StringComparison.Ordinal);
     }
@@ -111,19 +124,21 @@ public sealed class PackagingMetadataTests
         Assert.Contains("[English](README.md)", chinese, StringComparison.Ordinal);
         Assert.Contains("EnableAssistMode", english, StringComparison.Ordinal);
         Assert.Contains("EnableAssistMode", chinese, StringComparison.Ordinal);
-        Assert.Contains("1.1.1", english, StringComparison.Ordinal);
-        Assert.Contains("1.1.1", chinese, StringComparison.Ordinal);
+        Assert.Contains("EnableOnlineSessions", english, StringComparison.Ordinal);
+        Assert.Contains("EnableOnlineSessions", chinese, StringComparison.Ordinal);
+        Assert.Contains("1.2.0", english, StringComparison.Ordinal);
+        Assert.Contains("1.2.0", chinese, StringComparison.Ordinal);
         Assert.Contains(
             "Assist Mode and Full Assist Mode",
             english,
             StringComparison.Ordinal);
         Assert.Contains("战斗辅助模式和战斗托管模式", chinese, StringComparison.Ordinal);
         Assert.Contains(
-            "Infinity-Assist-Unlock-1.1.1.zip",
+            "Infinity-Assist-Unlock-1.2.0.zip",
             english,
             StringComparison.Ordinal);
         Assert.Contains(
-            "Infinity-Assist-Unlock-1.1.1.zip",
+            "Infinity-Assist-Unlock-1.2.0.zip",
             chinese,
             StringComparison.Ordinal);
         Assert.Contains("Configure Mod", english, StringComparison.Ordinal);

@@ -145,6 +145,7 @@ internal sealed class Mod : IDisposable
                 $"[{_modConfig.ModId}] Configuration updated: " +
                 $"Enabled={config.Enabled}, " +
                 $"EnableAssistMode={config.EnableAssistMode}, " +
+                $"EnableOnlineSessions={config.EnableOnlineSessions}, " +
                 "DiagnosticLogging=true.");
         }
     }
