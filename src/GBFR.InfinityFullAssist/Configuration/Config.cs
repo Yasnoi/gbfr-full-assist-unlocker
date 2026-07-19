@@ -11,12 +11,12 @@ public sealed class Config : IConfigurable
         new() { WriteIndented = true };
 
     [DisplayName("Enabled")]
-    [Description("Allow supported built-in Assist modes in Infinity quests on the verified game build.")]
+    [Description("Allow the built-in Full Assist Mode and Partial Assist Mode in Infinity quests on the verified game build.")]
     [DefaultValue(true)]
     public bool Enabled { get; set; } = true;
 
-    [DisplayName("Enable Partial Assist")]
-    [Description("Also allow the built-in Partial Assist mode in Infinity quests.")]
+    [DisplayName("Enable Partial Assist Mode")]
+    [Description("Allow the built-in Partial Assist Mode in addition to Full Assist Mode.")]
     [DefaultValue(false)]
     public bool EnablePartialAssist { get; set; }
 

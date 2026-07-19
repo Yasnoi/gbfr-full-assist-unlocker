@@ -26,7 +26,11 @@ public sealed class PackagingMetadataTests
             "Infinity Full Assist Unlock",
             root.GetProperty("ModName").GetString());
         Assert.Equal("AkieGZH", root.GetProperty("ModAuthor").GetString());
-        Assert.Equal("1.1.0", root.GetProperty("ModVersion").GetString());
+        Assert.Equal("1.1.1", root.GetProperty("ModVersion").GetString());
+        Assert.Contains(
+            "Full Assist Mode and Partial Assist Mode",
+            root.GetProperty("ModDescription").GetString(),
+            StringComparison.Ordinal);
         Assert.Equal(
             "GBFR.InfinityFullAssist.dll",
             root.GetProperty("ModDll").GetString());
@@ -107,8 +111,13 @@ public sealed class PackagingMetadataTests
         Assert.Contains("[English](README.md)", chinese, StringComparison.Ordinal);
         Assert.Contains("EnablePartialAssist", english, StringComparison.Ordinal);
         Assert.Contains("EnablePartialAssist", chinese, StringComparison.Ordinal);
-        Assert.Contains("1.1.0", english, StringComparison.Ordinal);
-        Assert.Contains("1.1.0", chinese, StringComparison.Ordinal);
+        Assert.Contains("1.1.1", english, StringComparison.Ordinal);
+        Assert.Contains("1.1.1", chinese, StringComparison.Ordinal);
+        Assert.Contains(
+            "Full Assist Mode and Partial Assist Mode",
+            english,
+            StringComparison.Ordinal);
+        Assert.Contains("战斗托管模式和战斗辅助模式", chinese, StringComparison.Ordinal);
         Assert.Contains("Configure Mod", english, StringComparison.Ordinal);
         Assert.Contains("Mod 配置", chinese, StringComparison.Ordinal);
     }
