@@ -31,17 +31,36 @@ internal sealed class ConfigStore : IDisposable
         Config config;
         if (File.Exists(_path))
         {
-            config = JsonSerializer.Deserialize<Config>(File.ReadAllBytes(_path), SerializerOptions) ?? new Config();
+            var json = File.ReadAllBytes(_path);
+            config = JsonSerializer.Deserialize<Config>(
+                json,
+                SerializerOptions) ?? new Config();
+            if (!ContainsPartialAssistSetting(json))
+            {
+                Write(config);
+            }
         }
         else
         {
             config = new Config();
-            File.WriteAllText(_path, JsonSerializer.Serialize(config, SerializerOptions));
+            Write(config);
         }
 
-        config.FilePath = _path;
         return config;
     }
+
+    private static bool ContainsPartialAssistSetting(ReadOnlyMemory<byte> json)
+    {
+        using var document = JsonDocument.Parse(json);
+        return document.RootElement.TryGetProperty(
+            nameof(Config.EnablePartialAssist),
+            out _);
+    }
+
+    private void Write(Config config) =>
+        File.WriteAllText(
+            _path,
+            JsonSerializer.Serialize(config, SerializerOptions));
 
     private void OnChanged(object sender, FileSystemEventArgs args)
     {

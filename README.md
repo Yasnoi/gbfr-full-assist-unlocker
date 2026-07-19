@@ -3,8 +3,9 @@
 **English** | [简体中文](README.zh-CN.md)
 
 This is a Reloaded-II mod for *Granblue Fantasy: Relink – Endless Ragnarok*.
-It removes the restriction that normally disables Full Assist in Infinity
-quests, allowing the game's built-in AI to continue fighting.
+It removes the restrictions that normally disable Full Assist Mode and Partial Assist Mode
+in Infinity quests, allowing the game's built-in AI to continue fighting.
+Partial Assist Mode must be enabled separately in the mod settings.
 
 The mod does not change the AI's behavior or handle special Infinity
 mechanics.
@@ -12,7 +13,8 @@ mechanics.
 ## Features
 
 - Applies only to Infinity quests.
-- Requires Full Assist to be selected in the game settings.
+- Full Assist Mode is available by default; Partial Assist Mode can be enabled
+  separately.
 - Works in solo and online sessions for both Hosts and Guests.
 - Does not affect other difficulties or Assist modes.
 - Does not modify damage, rewards, drops, save data, or network state.
@@ -49,10 +51,11 @@ imported.
 
 1. Add `granblue_fantasy_relink.exe` to Reloaded-II.
 2. Install and enable Granblue Fantasy Relink Mod Manager.
-3. Drag `Infinity-Full-Assist-Unlock-1.0.0.zip` into Reloaded-II.
+3. Drag `Infinity-Full-Assist-Unlock-1.1.1.zip` into Reloaded-II.
 4. Enable **Infinity Full Assist Unlock** for the game.
 5. Launch the game through Reloaded-II.
-6. Set Assist Mode to **Full Assist** before entering an Infinity quest.
+6. Set Assist Mode to **Full Assist Mode** or **Partial Assist Mode** before
+   entering an Infinity quest.
 
 For a manual installation, extract the archive contents to:
 
@@ -62,18 +65,27 @@ Reloaded-II\Mods\gbfr.qol.infinityfullassist
 
 ## Configuration
 
+Select **Infinity Full Assist Unlock** in Reloaded-II and choose
+**Configure Mod** to change these settings without launching the game.
+Reloaded-II creates or updates `Config.json` in the user configuration
+directory when the settings are saved.
+
 ```json
 {
   "Enabled": true,
+  "EnablePartialAssist": false,
   "DiagnosticLogging": false
 }
 ```
 
 - `Enabled`: turns the mod on or off.
+- `EnablePartialAssist`: also allows Partial Assist Mode. It is off by default
+  and does not affect Full Assist Mode.
 - `DiagnosticLogging`: writes diagnostic information to the Reloaded-II log.
   Enable it only when troubleshooting.
 
-Configuration can be changed while the game is running.
+You can also edit `Config.json` directly. Changes saved while the game is
+running are reloaded automatically.
 
 ## Tested
 
@@ -84,13 +96,15 @@ The following Infinity quests have been tested:
 - Lucilius
 - Bahamut Versa
 
-Full Assist worked in both solo and online sessions.
+Full Assist Mode worked in both solo and online sessions. Partial Assist Mode
+has also been confirmed in game.
 
 ## How it works
 
 The mod preserves the game's original checks. It only steps in when the game
-is about to disable Full Assist, then checks whether the player selected Full
-Assist and whether the current quest is an Infinity quest. It identifies
+is about to disable Full Assist Mode or Partial Assist Mode, then checks which
+mode the player selected, whether `EnablePartialAssist` is turned on when
+needed, and whether the current quest is an Infinity quest. It identifies
 Infinity quests by quest type first. If that type cannot be read, it falls
 back to a list of confirmed quests. When the necessary information is
 incomplete, the game's original result is left unchanged.
@@ -122,11 +136,12 @@ enabled for the game in Reloaded-II, then check the latest log for
 Check that all requirements are installed at the versions listed above. Old
 versions of SigScan or Universal Redirector can prevent the mod from loading.
 
-### Full Assist is still disabled in Infinity
+### An Assist mode is still disabled in Infinity
 
-Make sure **Full Assist**, rather than regular Assist mode, is selected in the
-game settings. Then enable `DiagnosticLogging`, enter the quest again, and
-check the Reloaded-II log.
+For Full Assist Mode, make sure **Full Assist Mode** is selected in the game
+settings. For Partial Assist Mode, also turn on `EnablePartialAssist` in the
+mod settings. You can then enable `DiagnosticLogging`, enter the quest again,
+and check the Reloaded-II log.
 
 ### The mod stopped working after a game update
 
