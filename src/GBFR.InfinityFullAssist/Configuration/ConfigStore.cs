@@ -46,7 +46,6 @@ internal sealed class ConfigStore : IDisposable
             Write(config);
         }
 
-        config.FilePath = _path;
         return config;
     }
 

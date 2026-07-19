@@ -109,6 +109,8 @@ public sealed class PackagingMetadataTests
         Assert.Contains("EnablePartialAssist", chinese, StringComparison.Ordinal);
         Assert.Contains("1.1.0", english, StringComparison.Ordinal);
         Assert.Contains("1.1.0", chinese, StringComparison.Ordinal);
+        Assert.Contains("Configure Mod", english, StringComparison.Ordinal);
+        Assert.Contains("Mod 配置", chinese, StringComparison.Ordinal);
     }
 
     private static string FindRepositoryRoot()

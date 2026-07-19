@@ -55,6 +55,10 @@ Reloaded-II\Mods\gbfr.qol.infinityfullassist
 
 ## 配置
 
+在 Reloaded-II 的模组列表中选中 **Infinity Full Assist Unlock**，点击
+“Mod 配置”即可修改设置，不需要先启动游戏。保存后，Reloaded-II 会在用户配置
+目录中创建或更新 `Config.json`。
+
 ```json
 {
   "Enabled": true,
@@ -67,7 +71,7 @@ Reloaded-II\Mods\gbfr.qol.infinityfullassist
 - `EnablePartialAssist`：同时允许部分托管模式。默认关闭，完全托管不受这个设置影响。
 - `DiagnosticLogging`：在 Reloaded-II 日志中记录诊断信息。只有排查问题时才需要开启。
 
-配置可以在游戏运行时修改。
+也可以直接编辑 `Config.json`。游戏运行期间保存配置后，模组会自动重新加载。
 
 ## 已验证
 

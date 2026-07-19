@@ -64,6 +64,11 @@ Reloaded-II\Mods\gbfr.qol.infinityfullassist
 
 ## Configuration
 
+Select **Infinity Full Assist Unlock** in Reloaded-II and choose
+**Configure Mod** to change these settings without launching the game.
+Reloaded-II creates or updates `Config.json` in the user configuration
+directory when the settings are saved.
+
 ```json
 {
   "Enabled": true,
@@ -78,7 +83,8 @@ Reloaded-II\Mods\gbfr.qol.infinityfullassist
 - `DiagnosticLogging`: writes diagnostic information to the Reloaded-II log.
   Enable it only when troubleshooting.
 
-Configuration can be changed while the game is running.
+You can also edit `Config.json` directly. Changes saved while the game is
+running are reloaded automatically.
 
 ## Tested
 
