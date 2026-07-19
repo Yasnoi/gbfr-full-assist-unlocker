@@ -2,14 +2,14 @@
 
 [English](README.md) | **简体中文**
 
-这是一个适用于《Granblue Fantasy: Relink – Endless Ragnarok》的 Reloaded-II 模组。这个模组会移除游戏原本在 Infinity 副本中禁用完全托管模式的限制，使游戏自带的 AI 可以继续接管战斗。
+这是一个适用于《Granblue Fantasy: Relink – Endless Ragnarok》的 Reloaded-II 模组。这个模组会移除游戏原本在 Infinity 副本中禁用完全托管模式的限制，使游戏自带的 AI 可以继续接管战斗。也可以通过设置同时允许部分托管模式。
 
 模组不会改变 AI 的行为，也不会处理 Infinity 的特殊机制。
 
 ## 功能
 
 - 只对 Infinity 副本生效。
-- 需要在游戏设置中选择“完全托管模式”。
+- 完全托管默认可用，部分托管可以单独开启。
 - 支持单人和联机，Host 与 Guest 均可使用。
 - 不影响其他难度或其他辅助模式。
 - 不修改伤害、奖励、掉落、存档或网络状态。
@@ -42,10 +42,10 @@ SHA-256: 63340832BCF731FBC97796F686B05C988418E83D451D4A49B2244A85D00E297F
 
 1. 在 Reloaded-II 中添加 `granblue_fantasy_relink.exe`。
 2. 安装并启用 Granblue Fantasy Relink Mod Manager。
-3. 将 `Infinity-Full-Assist-Unlock-1.0.0.zip` 拖入 Reloaded-II。
+3. 将 `Infinity-Full-Assist-Unlock-1.1.0.zip` 拖入 Reloaded-II。
 4. 为游戏启用 **Infinity Full Assist Unlock**。
 5. 通过 Reloaded-II 启动游戏。
-6. 在进入 Infinity 副本前，将游戏的辅助模式设为“完全托管”。
+6. 在进入 Infinity 副本前，将游戏的辅助模式设为“完全托管”或“部分托管”。
 
 手动安装时，将压缩包内容解压到：
 
@@ -58,11 +58,13 @@ Reloaded-II\Mods\gbfr.qol.infinityfullassist
 ```json
 {
   "Enabled": true,
+  "EnablePartialAssist": false,
   "DiagnosticLogging": false
 }
 ```
 
 - `Enabled`：开启或关闭模组功能。
+- `EnablePartialAssist`：同时允许部分托管模式。默认关闭，完全托管不受这个设置影响。
 - `DiagnosticLogging`：在 Reloaded-II 日志中记录诊断信息。只有排查问题时才需要开启。
 
 配置可以在游戏运行时修改。
@@ -76,11 +78,11 @@ Reloaded-II\Mods\gbfr.qol.infinityfullassist
 - Lucilius
 - Bahamut Versa
 
-完全托管在单人和联机模式下都可以正常启用。
+完全托管在单人和联机模式下都可以正常启用。部分托管使用相同的 Infinity 副本判断，但新增设置仍需要游戏内测试。
 
 ## 工作原理
 
-模组先保留游戏原本的判断逻辑。只有游戏准备禁用完全托管时，它才检查玩家是否选择了完全托管，以及当前副本是否属于 Infinity。识别 Infinity 时优先使用副本类型；类型无法读取时，再查询已经确认的副本列表。任何信息不完整的情况都会保持游戏原本的结果。
+模组先保留游戏原本的判断逻辑。只有游戏准备禁用托管模式时，它才检查玩家选择的是完全托管，还是已经通过设置开启的部分托管，以及当前副本是否属于 Infinity。识别 Infinity 时优先使用副本类型；类型无法读取时，再查询已经确认的副本列表。任何信息不完整的情况都会保持游戏原本的结果。
 
 模组按 Infinity 类型识别副本，因此如果后续版本更新了其他 Infinity 副本时，模组不需要依赖显示名称，也应该能够正常生效。
 
@@ -100,9 +102,9 @@ Reloaded-II\Mods\gbfr.qol.infinityfullassist
 
 检查前置依赖是否完整、版本是否符合要求。旧版 SigScan 或 Universal Redirector 可能导致加载失败。
 
-### Infinity 中仍然无法完全托管
+### Infinity 中仍然无法使用托管模式
 
-确认游戏设置中选择的是“完全托管”，而不是普通辅助模式。随后打开`DiagnosticLogging`，重新进入一次副本并查看 Reloaded-II 日志。
+使用完全托管时，确认游戏设置中已经选择“完全托管”。使用部分托管时，还需要在模组设置中打开 `EnablePartialAssist`。随后可以打开 `DiagnosticLogging`，重新进入一次副本并查看 Reloaded-II 日志。
 
 ### 游戏更新后模组停止工作
 

@@ -142,7 +142,10 @@ internal sealed class Mod : IDisposable
         if (config.DiagnosticLogging)
         {
             _logger.WriteLine(
-                $"[{_modConfig.ModId}] Configuration updated: Enabled={config.Enabled}, DiagnosticLogging=true.");
+                $"[{_modConfig.ModId}] Configuration updated: " +
+                $"Enabled={config.Enabled}, " +
+                $"EnablePartialAssist={config.EnablePartialAssist}, " +
+                "DiagnosticLogging=true.");
         }
     }
 

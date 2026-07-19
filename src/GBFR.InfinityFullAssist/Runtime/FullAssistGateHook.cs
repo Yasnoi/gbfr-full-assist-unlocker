@@ -64,7 +64,11 @@ internal sealed class FullAssistGateHook : IDisposable
 
         _classifier = new InfinityQuestClassifier(
             VerifiedInfinityData.FallbackQuestIds.ToArray());
-        _policy = new FullAssistGatePolicy(_classifier);
+        _policy = new FullAssistGatePolicy(
+            _classifier,
+            new AssistModeUnlockPolicy(
+                VerifiedInfinityData.PartialAssistMode,
+                VerifiedInfinityData.FullAssistMode));
         _questIdDecoder = new PackedQuestIdDecoder(
             new QuestTypeResolver(
                 (
@@ -103,13 +107,15 @@ internal sealed class FullAssistGateHook : IDisposable
 
     internal bool EvaluateForTests(
         bool originalResult,
-        bool fullAssistSelected,
+        byte assistMode,
         QuestSnapshot snapshot)
     {
+        var config = Volatile.Read(ref _config);
         return _policy.Decide(
             originalResult,
-            Volatile.Read(ref _config).Enabled,
-            fullAssistSelected,
+            config.Enabled,
+            config.EnablePartialAssist,
+            assistMode,
             snapshot);
     }
 
@@ -170,7 +176,7 @@ internal sealed class FullAssistGateHook : IDisposable
                 hook.Activate();
 
                 _logger.WriteLine(
-                    $"[{_modId}] Infinity Full Assist gate hook installed for ER 2.0.2.",
+                    $"[{_modId}] Infinity Assist gate hook installed for ER 2.0.2.",
                     System.Drawing.Color.Green);
             }
             catch (Exception ex)
@@ -233,12 +239,11 @@ internal sealed class FullAssistGateHook : IDisposable
             }
 
             var quest = _questIdDecoder.Decode(state.QuestId);
-            var fullAssistSelected =
-                state.AssistMode == VerifiedInfinityData.FullAssistMode;
             var result = _policy.Decide(
                 originalResult: false,
                 enabled: config.Enabled,
-                fullAssistSelected,
+                enablePartialAssist: config.EnablePartialAssist,
+                assistMode: state.AssistMode,
                 quest);
             var finalResult = result ? (byte)1 : originalResult;
 
