@@ -82,7 +82,7 @@ Reloaded-II\Mods\gbfr.qol.infinityfullassist
 - Lucilius
 - Bahamut Versa
 
-完全托管在单人和联机模式下都可以正常启用。部分托管使用相同的 Infinity 副本判断，但新增设置仍需要游戏内测试。
+完全托管在单人和联机模式下都可以正常启用，部分托管也已经完成游戏内测试。
 
 ## 工作原理
 

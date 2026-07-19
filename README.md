@@ -95,8 +95,8 @@ The following Infinity quests have been tested:
 - Lucilius
 - Bahamut Versa
 
-Full Assist worked in both solo and online sessions. Partial Assist uses the
-same Infinity quest check, but the new setting still needs in-game testing.
+Full Assist worked in both solo and online sessions. Partial Assist has also
+been confirmed in game.
 
 ## How it works
 
