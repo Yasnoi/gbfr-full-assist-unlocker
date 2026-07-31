@@ -164,7 +164,7 @@ internal sealed class Mod : IDisposable
             if (status == BuildVerificationStatus.Verified)
             {
                 _logger.WriteLine(
-                    $"[{_modConfig.ModId}] Verified Endless Ragnarok 2.0.2 executable.",
+                    $"[{_modConfig.ModId}] Verified Endless Ragnarok 2.0.3 executable.",
                     System.Drawing.Color.Green);
             }
             else

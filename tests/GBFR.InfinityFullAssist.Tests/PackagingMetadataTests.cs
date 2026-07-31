@@ -26,7 +26,7 @@ public sealed class PackagingMetadataTests
             "Infinity Assist Unlock",
             root.GetProperty("ModName").GetString());
         Assert.Equal("AkieGZH", root.GetProperty("ModAuthor").GetString());
-        Assert.Equal("1.2.1", root.GetProperty("ModVersion").GetString());
+        Assert.Equal("1.2.2", root.GetProperty("ModVersion").GetString());
         Assert.Contains(
             "Assist Mode and Full Assist Mode",
             root.GetProperty("ModDescription").GetString(),
@@ -86,7 +86,7 @@ public sealed class PackagingMetadataTests
             "src",
             "GBFR.InfinityFullAssist",
             "Signatures",
-            "granblue_fantasy_relink_er_2_0_2.ini"));
+            "granblue_fantasy_relink_er_2_0_3.ini"));
 
         Assert.Contains("[Scans]", text, StringComparison.Ordinal);
         Assert.Contains(FullAssistGateHook.GateSignature, text, StringComparison.Ordinal);
@@ -126,19 +126,19 @@ public sealed class PackagingMetadataTests
         Assert.Contains("EnableAssistMode", chinese, StringComparison.Ordinal);
         Assert.Contains("EnableOnlineSessions", english, StringComparison.Ordinal);
         Assert.Contains("EnableOnlineSessions", chinese, StringComparison.Ordinal);
-        Assert.Contains("1.2.1", english, StringComparison.Ordinal);
-        Assert.Contains("1.2.1", chinese, StringComparison.Ordinal);
+        Assert.Contains("1.2.2", english, StringComparison.Ordinal);
+        Assert.Contains("1.2.2", chinese, StringComparison.Ordinal);
         Assert.Contains(
             "Assist Mode and Full Assist Mode",
             english,
             StringComparison.Ordinal);
         Assert.Contains("战斗辅助模式和战斗托管模式", chinese, StringComparison.Ordinal);
         Assert.Contains(
-            "Infinity-Assist-Unlock-1.2.1.zip",
+            "Infinity-Assist-Unlock-1.2.2.zip",
             english,
             StringComparison.Ordinal);
         Assert.Contains(
-            "Infinity-Assist-Unlock-1.2.1.zip",
+            "Infinity-Assist-Unlock-1.2.2.zip",
             chinese,
             StringComparison.Ordinal);
         Assert.Contains("Configure Mod", english, StringComparison.Ordinal);

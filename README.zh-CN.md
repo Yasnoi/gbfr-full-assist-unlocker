@@ -16,14 +16,14 @@
 
 ## 支持版本
 
-目前支持游戏主界面显示为 `2.0.2` 的 Endless Ragnarok。开发和游戏内测试使用的游戏主程序为：
+目前支持游戏主界面显示为 `2.0.3` 的 Endless Ragnarok。开发和游戏内测试使用的游戏主程序为：
 
 ```text
-ApplicationVersion: 2.0.2
-SHA-256: 63340832BCF731FBC97796F686B05C988418E83D451D4A49B2244A85D00E297F
+ApplicationVersion: 2.0.3
+SHA-256: 1BBBEC61AAB7F75FE328CF6BFE0247EBDBCEC6C404CEC12C032B8FFA41D22102
 ```
 
-SHA-256 只用于标记已经完成验证的准确构建，并不是启用白名单。其他同为 Endless Ragnarok 2.0.2 的游戏主程序，如果每个必要特征码都只有一个匹配，而且周围的指令结构通过验证，模组也可以正常运行。特征码缺失、重复或结构不兼容时，模组会保持游戏原本的行为。
+SHA-256 只用于标记已经完成验证的准确构建，并不是启用白名单。其他同为 Endless Ragnarok 2.0.3 的游戏主程序，如果每个必要特征码都只有一个匹配，而且周围的指令结构通过验证，模组也可以正常运行。特征码缺失、重复或结构不兼容时，模组会保持游戏原本的行为。
 
 ## 前置要求
 
@@ -42,7 +42,7 @@ SHA-256 只用于标记已经完成验证的准确构建，并不是启用白名
 
 1. 在 Reloaded-II 中添加 `granblue_fantasy_relink.exe`。
 2. 安装并启用 Granblue Fantasy Relink Mod Manager。
-3. 将 `Infinity-Assist-Unlock-1.2.1.zip` 拖入 Reloaded-II。
+3. 将 `Infinity-Assist-Unlock-1.2.2.zip` 拖入 Reloaded-II。
 4. 为游戏启用 **Infinity Assist Unlock**。
 5. 通过 Reloaded-II 启动游戏。
 6. 在进入 Infinity 副本前，将游戏的辅助模式设为“战斗辅助模式”或“战斗托管模式”。
@@ -114,7 +114,7 @@ Reloaded-II\Mods\gbfr.qol.infinityfullassist
 
 ### 游戏更新后模组停止工作
 
-如果游戏显示的版本号已经变化，模组会保持未启用状态。如果仍为 2.0.2，请检查 Reloaded-II 日志：SHA-256 不同只会显示提示；必要特征码缺失、重复或指令结构不兼容时，模组才不会安装 Hook。运行时验证失败时，请停用模组并等待兼容版本。
+如果游戏显示的版本号已经变化，模组会保持未启用状态。如果仍为 2.0.3，请检查 Reloaded-II 日志：SHA-256 不同只会显示提示；必要特征码缺失、重复或指令结构不兼容时，模组才不会安装 Hook。运行时验证失败时，请停用模组并等待兼容版本。
 
 或者，你也可以选择下载源码，修改游戏版本检验和运行时特征码，然后自行编译。
 

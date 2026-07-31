@@ -22,16 +22,16 @@ mechanics.
 
 ## Supported version
 
-The current release supports Endless Ragnarok with `2.0.2` shown on the
+The current release supports Endless Ragnarok with `2.0.3` shown on the
 game's main menu. Development and in-game testing used this executable:
 
 ```text
-ApplicationVersion: 2.0.2
-SHA-256: 63340832BCF731FBC97796F686B05C988418E83D451D4A49B2244A85D00E297F
+ApplicationVersion: 2.0.3
+SHA-256: 1BBBEC61AAB7F75FE328CF6BFE0247EBDBCEC6C404CEC12C032B8FFA41D22102
 ```
 
 The SHA-256 identifies the exact build that was verified, but it is not an
-allowlist. Another Endless Ragnarok 2.0.2 executable can run the mod when each
+allowlist. Another Endless Ragnarok 2.0.3 executable can run the mod when each
 required signature has exactly one match and the surrounding instruction
 structure passes validation. Missing, duplicate, or incompatible signatures
 leave the game's original behavior unchanged.
@@ -54,7 +54,7 @@ imported.
 
 1. Add `granblue_fantasy_relink.exe` to Reloaded-II.
 2. Install and enable Granblue Fantasy Relink Mod Manager.
-3. Drag `Infinity-Assist-Unlock-1.2.1.zip` into Reloaded-II.
+3. Drag `Infinity-Assist-Unlock-1.2.2.zip` into Reloaded-II.
 4. Enable **Infinity Assist Unlock** for the game.
 5. Launch the game through Reloaded-II.
 6. Set Assist Mode to **Assist Mode** or **Full Assist Mode** before
@@ -155,7 +155,7 @@ Reloaded-II log.
 ### The mod stopped working after a game update
 
 If the displayed application version has changed, the mod remains inactive.
-For a different 2.0.2 executable, check the Reloaded-II log: a SHA-256 warning
+For a different 2.0.3 executable, check the Reloaded-II log: a SHA-256 warning
 is informational, while a missing, duplicate, or incompatible required
 signature prevents the Hook from being installed. Disable the mod and wait
 for a compatible release if runtime validation fails.
