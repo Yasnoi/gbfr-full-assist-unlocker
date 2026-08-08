@@ -21,7 +21,7 @@ public sealed class BuildVerifierTests
     [Fact]
     public void DifferentVersionIsUnsupported()
     {
-        var identity = new BuildIdentity(new Version(2, 0, 4), BuildVerifier.SupportedSha256);
+        var identity = new BuildIdentity(new Version(2, 0, 5), BuildVerifier.SupportedSha256);
 
         Assert.Equal(
             BuildVerificationStatus.Unsupported,

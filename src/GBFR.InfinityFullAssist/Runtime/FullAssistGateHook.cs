@@ -10,7 +10,7 @@ namespace GBFR.InfinityFullAssist.Runtime;
 
 internal sealed class FullAssistGateHook : IDisposable
 {
-    private const string SignatureGroup = "granblue_fantasy_relink_er_2_0_3";
+    private const string SignatureGroup = "granblue_fantasy_relink_er";
     private const string GateScanName = "FullAssistGate";
     private const string AssistDisableHandlerScanName =
         "AssistDisableTermHandler";
@@ -293,7 +293,7 @@ internal sealed class FullAssistGateHook : IDisposable
                 hook.Activate();
 
                 _logger.WriteLine(
-                    $"[{_modId}] Infinity Assist gate hook installed for ER 2.0.3.",
+                    $"[{_modId}] Infinity Assist gate hook installed for ER 2.0.4.",
                     System.Drawing.Color.Green);
             }
             catch (Exception ex)

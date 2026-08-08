@@ -10,7 +10,7 @@ internal delegate void CurrentQuestIdGetter(
 
 internal sealed class QuestRuntimeStateReader
 {
-    // Verified against ER 2.0.3 and guarded by runtime instruction validation.
+    // Verified against ER 2.0.4 and guarded by runtime instruction validation.
     internal const int AssistModeOffset = 0x10;
     internal const int DisableAssistTermOffset = 0xE4E;
     internal const int OnlineQuestModeOffset = 0x4;
