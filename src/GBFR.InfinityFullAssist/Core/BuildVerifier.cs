@@ -4,9 +4,9 @@ namespace GBFR.InfinityFullAssist.Core;
 
 public sealed class BuildVerifier
 {
-    public static readonly Version SupportedApplicationVersion = new(2, 0, 2);
+    public static readonly Version SupportedApplicationVersion = new(2, 0, 4);
     public const string SupportedSha256 =
-        "63340832BCF731FBC97796F686B05C988418E83D451D4A49B2244A85D00E297F";
+        "F827F3C13CAA90B290FAB2FE7E28165A80448FDE0A3F7A96D79DAC6B8343FF2A";
 
     public BuildVerificationStatus Verify(in BuildIdentity identity)
     {

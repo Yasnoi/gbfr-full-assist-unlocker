@@ -155,16 +155,26 @@ internal sealed class Mod : IDisposable
 
             if (status == BuildVerificationStatus.Unsupported)
             {
-                LogFailure(
+                if (!_configStore.Current.IgnoreVersionCheck)
+                {
+                    LogFailure(
+                        $"Unsupported ApplicationVersion " +
+                        $"{identity.ApplicationVersion}; original behavior retained.");
+                    return false;
+                }
+
+                LogWarning(
                     $"Unsupported ApplicationVersion " +
-                    $"{identity.ApplicationVersion}; original behavior retained.");
-                return false;
+                    $"{identity.ApplicationVersion}; the version check is bypassed " +
+                    "via IgnoreVersionCheck. Runtime signature validation will " +
+                    "determine compatibility.");
+                return true;
             }
 
             if (status == BuildVerificationStatus.Verified)
             {
                 _logger.WriteLine(
-                    $"[{_modConfig.ModId}] Verified Endless Ragnarok 2.0.2 executable.",
+                    $"[{_modConfig.ModId}] Verified Endless Ragnarok 2.0.4 executable.",
                     System.Drawing.Color.Green);
             }
             else

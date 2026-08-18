@@ -22,7 +22,7 @@
     <Content Include="ModConfig.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Signatures\granblue_fantasy_relink_er_2_0_2.ini">
+    <Content Include="Signatures\granblue_fantasy_relink_er.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Preview.png">

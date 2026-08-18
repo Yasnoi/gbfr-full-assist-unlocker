@@ -30,6 +30,11 @@ public sealed class Config : IConfigurable
     [DefaultValue(false)]
     public bool DiagnosticLogging { get; set; }
 
+    [DisplayName("Ignore Version Check")]
+    [Description("Keep the mod active on unrecognized game versions and rely on runtime signature validation. Enable this to survive minor game updates; the hook still installs only when every required signature matches exactly.")]
+    [DefaultValue(false)]
+    public bool IgnoreVersionCheck { get; set; }
+
     [JsonIgnore]
     [Browsable(false)]
     public string? FilePath { get; private set; }

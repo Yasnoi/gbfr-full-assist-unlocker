@@ -25,28 +25,28 @@ public sealed class ExecutableSignatureTests
         AssertUniqueAt(
             executable,
             FullAssistGateHook.GateSignature,
-            expectedRawOffset: 0x218690);
+            expectedRawOffset: 0x211780);
         AssertUniqueAt(
             executable,
             FullAssistGateHook.AssistDisableHandlerSignature,
-            expectedRawOffset: 0x3207E30);
+            expectedRawOffset: 0x3203870);
         AssertUniqueAt(
             executable,
             FullAssistGateHook.OnlineQuestModeSignature,
-            expectedRawOffset: 0x3217900);
+            expectedRawOffset: 0x3213340);
 
         AssertMatchesAt(
             executable,
             FullAssistGateHook.GateValidationSignature,
-            expectedRawOffset: 0x218690);
+            expectedRawOffset: 0x211780);
         AssertMatchesAt(
             executable,
             FullAssistGateHook.AssistDisableHandlerValidationSignature,
-            expectedRawOffset: 0x3207E30);
+            expectedRawOffset: 0x3203870);
         AssertMatchesAt(
             executable,
             FullAssistGateHook.OnlineQuestModeValidationSignature,
-            expectedRawOffset: 0x3217900);
+            expectedRawOffset: 0x3213340);
     }
 
     [Fact]
@@ -72,15 +72,15 @@ public sealed class ExecutableSignatureTests
         AssertUniqueAt(
             executable,
             FullAssistGateHook.GateSignature,
-            expectedRawOffset: 0x218690);
+            expectedRawOffset: 0x211780);
         AssertUniqueAt(
             executable,
             FullAssistGateHook.AssistDisableHandlerSignature,
-            expectedRawOffset: 0x3207E30);
+            expectedRawOffset: 0x3203870);
         AssertUniqueAt(
             executable,
             FullAssistGateHook.OnlineQuestModeSignature,
-            expectedRawOffset: 0x3217900);
+            expectedRawOffset: 0x3213340);
     }
 
     private static void AssertUniqueAt(

@@ -26,7 +26,7 @@ public sealed class PackagingMetadataTests
             "Infinity Assist Unlock",
             root.GetProperty("ModName").GetString());
         Assert.Equal("AkieGZH", root.GetProperty("ModAuthor").GetString());
-        Assert.Equal("1.2.1", root.GetProperty("ModVersion").GetString());
+        Assert.Equal("1.2.3", root.GetProperty("ModVersion").GetString());
         Assert.Contains(
             "Assist Mode and Full Assist Mode",
             root.GetProperty("ModDescription").GetString(),
@@ -50,7 +50,7 @@ public sealed class PackagingMetadataTests
     }
 
     [Fact]
-    public void UserConfigurationSerializesOnlyTheFourPublicSettings()
+    public void UserConfigurationSerializesOnlyThePublicSettings()
     {
         using var document = JsonDocument.Parse(
             JsonSerializer.Serialize(new Config()));
@@ -64,7 +64,8 @@ public sealed class PackagingMetadataTests
                 "Enabled",
                 "EnableAssistMode",
                 "EnableOnlineSessions",
-                "DiagnosticLogging"
+                "DiagnosticLogging",
+                "IgnoreVersionCheck"
             ],
             propertyNames);
         Assert.True(document.RootElement.GetProperty("Enabled").GetBoolean());
@@ -76,6 +77,8 @@ public sealed class PackagingMetadataTests
                 .GetBoolean());
         Assert.False(
             document.RootElement.GetProperty("DiagnosticLogging").GetBoolean());
+        Assert.False(
+            document.RootElement.GetProperty("IgnoreVersionCheck").GetBoolean());
     }
 
     [Fact]
@@ -86,7 +89,7 @@ public sealed class PackagingMetadataTests
             "src",
             "GBFR.InfinityFullAssist",
             "Signatures",
-            "granblue_fantasy_relink_er_2_0_2.ini"));
+            "granblue_fantasy_relink_er.ini"));
 
         Assert.Contains("[Scans]", text, StringComparison.Ordinal);
         Assert.Contains(FullAssistGateHook.GateSignature, text, StringComparison.Ordinal);
@@ -126,19 +129,19 @@ public sealed class PackagingMetadataTests
         Assert.Contains("EnableAssistMode", chinese, StringComparison.Ordinal);
         Assert.Contains("EnableOnlineSessions", english, StringComparison.Ordinal);
         Assert.Contains("EnableOnlineSessions", chinese, StringComparison.Ordinal);
-        Assert.Contains("1.2.1", english, StringComparison.Ordinal);
-        Assert.Contains("1.2.1", chinese, StringComparison.Ordinal);
+        Assert.Contains("1.2.3", english, StringComparison.Ordinal);
+        Assert.Contains("1.2.3", chinese, StringComparison.Ordinal);
         Assert.Contains(
             "Assist Mode and Full Assist Mode",
             english,
             StringComparison.Ordinal);
         Assert.Contains("战斗辅助模式和战斗托管模式", chinese, StringComparison.Ordinal);
         Assert.Contains(
-            "Infinity-Assist-Unlock-1.2.1.zip",
+            "Infinity-Assist-Unlock-1.2.3.zip",
             english,
             StringComparison.Ordinal);
         Assert.Contains(
-            "Infinity-Assist-Unlock-1.2.1.zip",
+            "Infinity-Assist-Unlock-1.2.3.zip",
             chinese,
             StringComparison.Ordinal);
         Assert.Contains("Configure Mod", english, StringComparison.Ordinal);

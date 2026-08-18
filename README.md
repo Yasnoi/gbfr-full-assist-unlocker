@@ -22,16 +22,16 @@ mechanics.
 
 ## Supported version
 
-The current release supports Endless Ragnarok with `2.0.2` shown on the
+The current release supports Endless Ragnarok with `2.0.4` shown on the
 game's main menu. Development and in-game testing used this executable:
 
 ```text
-ApplicationVersion: 2.0.2
-SHA-256: 63340832BCF731FBC97796F686B05C988418E83D451D4A49B2244A85D00E297F
+ApplicationVersion: 2.0.4
+SHA-256: F827F3C13CAA90B290FAB2FE7E28165A80448FDE0A3F7A96D79DAC6B8343FF2A
 ```
 
 The SHA-256 identifies the exact build that was verified, but it is not an
-allowlist. Another Endless Ragnarok 2.0.2 executable can run the mod when each
+allowlist. Another Endless Ragnarok 2.0.4 executable can run the mod when each
 required signature has exactly one match and the surrounding instruction
 structure passes validation. Missing, duplicate, or incompatible signatures
 leave the game's original behavior unchanged.
@@ -54,7 +54,7 @@ imported.
 
 1. Add `granblue_fantasy_relink.exe` to Reloaded-II.
 2. Install and enable Granblue Fantasy Relink Mod Manager.
-3. Drag `Infinity-Assist-Unlock-1.2.1.zip` into Reloaded-II.
+3. Drag `Infinity-Assist-Unlock-1.2.3.zip` into Reloaded-II.
 4. Enable **Infinity Assist Unlock** for the game.
 5. Launch the game through Reloaded-II.
 6. Set Assist Mode to **Assist Mode** or **Full Assist Mode** before
@@ -78,7 +78,8 @@ directory when the settings are saved.
   "Enabled": true,
   "EnableAssistMode": false,
   "EnableOnlineSessions": true,
-  "DiagnosticLogging": false
+  "DiagnosticLogging": false,
+  "IgnoreVersionCheck": false
 }
 ```
 
@@ -90,6 +91,12 @@ directory when the settings are saved.
   solo quests.
 - `DiagnosticLogging`: writes diagnostic information to the Reloaded-II log.
   Enable it only when troubleshooting.
+- `IgnoreVersionCheck`: keeps the mod active on unrecognized game versions and
+  relies on runtime signature validation instead of the exact version match.
+  It is off by default. Enable it to survive minor game updates without
+  rebuilding: the hook still installs only when every required signature has
+  exactly one match and passes instruction-structure validation, so an
+  incompatible build simply leaves the original behavior unchanged.
 
 You can also edit `Config.json` directly. Changes saved while the game is
 running are reloaded automatically.
@@ -154,14 +161,17 @@ Reloaded-II log.
 
 ### The mod stopped working after a game update
 
-If the displayed application version has changed, the mod remains inactive.
-For a different 2.0.2 executable, check the Reloaded-II log: a SHA-256 warning
-is informational, while a missing, duplicate, or incompatible required
-signature prevents the Hook from being installed. Disable the mod and wait
-for a compatible release if runtime validation fails.
+If the displayed application version has changed, the mod remains inactive by
+default. Enable `IgnoreVersionCheck` (see Configuration) to keep it active
+across minor game updates: as long as Capcom does not change the hooked code,
+runtime signature validation resolves everything automatically and no rebuild
+is needed. For a different executable, check the Reloaded-II log: a SHA-256
+warning is informational, while a missing, duplicate, or incompatible required
+signature prevents the Hook from being installed and leaves the original
+behavior unchanged.
 
-Alternatively, you can download the source, update the game-version validation
-and runtime signatures, then compile the mod yourself.
+If a future update does change the hooked code, you can download the source,
+refresh the runtime signatures, then compile the mod yourself.
 
 ## Building from source
 

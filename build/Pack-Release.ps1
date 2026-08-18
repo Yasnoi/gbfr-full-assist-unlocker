@@ -69,14 +69,14 @@ Copy-Item -LiteralPath $sourceReadme -Destination (
 Copy-Item -LiteralPath $sourceChineseReadme -Destination (
     Join-Path $stagingRoot 'README.zh-CN.md')
 Copy-Item -LiteralPath (
-    Join-Path $buildOutput 'Signatures\granblue_fantasy_relink_er_2_0_2.ini'
+    Join-Path $buildOutput 'Signatures\granblue_fantasy_relink_er.ini'
 ) -Destination (Join-Path $stagingRoot 'Signatures')
 
 $expectedEntries = @(
     $rootFiles
     'README.md'
     'README.zh-CN.md'
-    'Signatures/granblue_fantasy_relink_er_2_0_2.ini'
+    'Signatures/granblue_fantasy_relink_er.ini'
 ) | Sort-Object
 
 $stagedEntries = Get-ChildItem -LiteralPath $stagingRoot -Recurse -File |
